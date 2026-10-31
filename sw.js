@@ -1,5 +1,5 @@
 /* オフライン用サービスワーカー：一度開いたら全ファイルを端末に保存し、以後はネットなしで動く */
-const CACHE = "gakka-quiz-v8";
+const CACHE = "gakka-quiz-v9";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
