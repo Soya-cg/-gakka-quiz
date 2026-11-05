@@ -114,6 +114,10 @@ details summary{cursor:pointer;font-size:14px;color:var(--sub)}
 .exp.cmpmemo .lbl{color:var(--ok)}
 .chips.cmp .chip{font-size:13px}
 .flash .qcat{align-self:flex-start}
+.voicebox summary{font-size:14px;color:var(--sub);cursor:pointer}
+.vrow{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:14px}
+.vrow select{flex:1;font-size:15px;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+.vrow input[type=range]{flex:1}
 .topbar>.link{white-space:nowrap;flex-shrink:0}
 .topbar>span:nth-child(2){flex:1;min-width:0;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tr{flex-shrink:0;white-space:nowrap}
@@ -1450,9 +1454,24 @@ function toSpeech(t){
     .replace(/(\d)cc/g,"$1シーシー").replace(/(\d)mm/g,"$1ミリ").replace(/(\d)m\b/g,"$1メートル").replace(/(\d)m(?=[^a-zA-Z])/g,"$1メートル")
     .replace(/(\d)t\b/g,"$1トン").replace(/[（(]/g,"、").replace(/[）)]/g,"、").replace(/[／/]/g,"、");
 }
+function jaVoices(){
+  if(!canSpeak()) return [];
+  try{ return speechSynthesis.getVoices().filter(v=>/^ja/i.test(v.lang)); }catch(e){ return []; }
+}
+function pickVoice(){
+  const vs=jaVoices(); const want=(typeof store!=="undefined"&&store.settings)?store.settings.voice:"";
+  return vs.find(v=>v.voiceURI===want) || null;
+}
 function speak(t){
   if(!canSpeak()) return;
-  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(toSpeech(t)); u.lang="ja-JP"; u.rate=1.05; speechSynthesis.speak(u); }catch(e){}
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(toSpeech(t)); u.lang="ja-JP";
+    const v=pickVoice(); if(v) u.voice=v;
+    const st=(typeof store!=="undefined"&&store.settings)?store.settings:{};
+    u.rate=st.rate||1.05; u.pitch=st.pitch||1;
+    speechSynthesis.speak(u);
+  }catch(e){}
 }
 function stopSpeak(){ if(canSpeak()) try{ speechSynthesis.cancel(); }catch(e){} }
 
@@ -1465,7 +1484,7 @@ const BANK_KK = KIKEN.map((k,i)=>({id:"k"+i,kind:"kk",cat:"危険予測",s:k.s,t
 const KEY = "gakkaQuiz.tokyo.v2";
 let store = {stats:{}, custom:[], settings:{}, srs:{}, flash:{}};
 try{ const s = localStorage.getItem(KEY); if(s) store = Object.assign(store, JSON.parse(s)); }catch(e){}
-store.settings = Object.assign({answerMode:"instant", timeLimit:false, includeHard:false, tts:false}, store.settings||{});
+store.settings = Object.assign({answerMode:"instant", timeLimit:false, includeHard:false, tts:false, voice:"", rate:1.05, pitch:1}, store.settings||{});
 store.srs = store.srs||{}; store.flash = store.flash||{};
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
 
@@ -1545,6 +1564,13 @@ function home(){
     <div class="sub">練習・分野別・苦手復習に適用されます。模擬試験は常に全問解答してから採点します。</div>
 
     <label class="toggle"><input type="checkbox" ${st.tts?"checked":""} onchange="setTTS(this.checked)"> 問題と解説を自動で読み上げる${canSpeak()?"":"（この端末では使えません）"}</label>
+    ${canSpeak()?`<details class="card voicebox"><summary>読み上げの声と速さ</summary>
+      <label class="vrow">声 <select id="voiceSel" onchange="setVoice(this.value)">${voiceOptions()}</select></label>
+      <label class="vrow">速さ <input type="range" min="0.6" max="1.6" step="0.05" value="${st.rate}" oninput="setRate(this.value)"> <span id="rateVal">${Number(st.rate).toFixed(2)}倍</span></label>
+      <label class="vrow">高さ <input type="range" min="0.6" max="1.6" step="0.05" value="${st.pitch}" oninput="setPitch(this.value)"> <span id="pitchVal">${Number(st.pitch).toFixed(2)}</span></label>
+      <button class="btn ghost center" onclick="speak('赤色の灯火の点滅信号では、一時停止しなければならない。正解はマル。')">試しに聞く</button>
+      <div class="sub">iPhoneに入っている日本語の声から選べます。声を増やすには、iPhoneの「設定」→「アクセシビリティ」→「読み上げコンテンツ」→「声」→「日本語」からダウンロードしてください（追加後はアプリを開き直すと一覧に出ます）。</div>
+    </details>`:""}
     <label class="toggle strong"><input type="checkbox" ${st.includeHard?"checked":""} onchange="setHard(this.checked)"> 意地悪なひっかけ・奇問も出題する（${hardAll().length}問）</label>
     <div class="sub">オンにすると、練習・分野別・模擬試験のすべてに意地悪問題が混ざります。</div>
 
@@ -1640,6 +1666,15 @@ function home(){
 function setMode(m){ store.settings.answerMode=m; save(); home(); }
 function setTimeLimit(v){ store.settings.timeLimit=v; save(); }
 function setHard(v){ store.settings.includeHard=v; save(); home(); }
+function voiceOptions(){
+  const vs=jaVoices(); const cur=store.settings.voice;
+  if(!vs.length) return `<option value="">標準の声</option>`;
+  return `<option value="" ${cur?"":"selected"}>標準の声</option>`+vs.map(v=>`<option value="${esc(v.voiceURI)}" ${v.voiceURI===cur?"selected":""}>${esc(v.name)}${v.localService===false?"（オンライン）":""}</option>`).join("");
+}
+function setVoice(v){ store.settings.voice=v; save(); speak("この声で読み上げます"); }
+function setRate(v){ store.settings.rate=Number(v); save(); const e=document.getElementById("rateVal"); if(e) e.textContent=Number(v).toFixed(2)+"倍"; }
+function setPitch(v){ store.settings.pitch=Number(v); save(); const e=document.getElementById("pitchVal"); if(e) e.textContent=Number(v).toFixed(2); }
+if(canSpeak()){ try{ speechSynthesis.onvoiceschanged=()=>{ const el=document.getElementById("voiceSel"); if(el) el.innerHTML=voiceOptions(); }; speechSynthesis.getVoices(); }catch(e){} }
 function setTTS(v){ store.settings.tts=v; save(); if(v) speak("読み上げをオンにしました"); else stopSpeak(); }
 
 /* ===== 出題開始 =====
