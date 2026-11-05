@@ -124,14 +124,24 @@ details summary{cursor:pointer;font-size:14px;color:var(--sub)}
 .flash{min-height:220px;cursor:pointer;display:flex;flex-direction:column;gap:12px}
 .ffront{font-size:20px;font-weight:700;margin-top:8px}
 .fback{font-size:24px;font-weight:800;color:var(--accent);border-top:1px dashed var(--line);padding-top:12px}.sign.small svg.wide{height:44px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.listen-btn{background:#3b3f8f}
+.listen .lcard{min-height:300px}
+.lq{font-size:20px;line-height:1.7;margin:12px 0;opacity:.9}
+.lq.small{font-size:16px}
+.la{font-size:44px;font-weight:800;margin:6px 0}
+.lexp{font-size:15px;color:var(--sub);margin-top:8px}
+.lexp.trap{color:var(--warn)}
+.lk{font-size:15px;margin:8px 0}
+#dlStatus .mbar{margin-top:6px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
 <div class="wrap" id="app"></div>
 <script>
+const AUDIO_NAMES="a_o,a_x,c0,c1,c10,c11,c12,c13,c14,c15,c2,c3,c4,c5,c6,c7,c8,c9,f0_a,f0_q,f10_a,f10_q,f11_a,f11_q,f12_a,f12_q,f13_a,f13_q,f14_a,f14_q,f15_a,f15_q,f16_a,f16_q,f17_a,f17_q,f18_a,f18_q,f19_a,f19_q,f1_a,f1_q,f20_a,f20_q,f21_a,f21_q,f22_a,f22_q,f23_a,f23_q,f24_a,f24_q,f25_a,f25_q,f26_a,f26_q,f27_a,f27_q,f28_a,f28_q,f29_a,f29_q,f2_a,f2_q,f30_a,f30_q,f31_a,f31_q,f32_a,f32_q,f33_a,f33_q,f34_a,f34_q,f35_a,f35_q,f36_a,f36_q,f37_a,f37_q,f38_a,f38_q,f39_a,f39_q,f3_a,f3_q,f40_a,f40_q,f41_a,f41_q,f42_a,f42_q,f43_a,f43_q,f44_a,f44_q,f45_a,f45_q,f46_a,f46_q,f47_a,f47_q,f48_a,f48_q,f49_a,f49_q,f4_a,f4_q,f50_a,f50_q,f51_a,f51_q,f52_a,f52_q,f53_a,f53_q,f5_a,f5_q,f6_a,f6_q,f7_a,f7_q,f8_a,f8_q,f9_a,f9_q,fl_af1,fl_af2,fl_af3,fl_af4,fl_af5,fl_af6,fl_af7,fl_af8,fl_af9,fl_an1,fl_an2,fl_an3,fl_an4,fl_an5,fl_an6,fl_an7,fl_ff1,fl_ff2,fl_ff3,fl_ff4,fl_he1,fl_he2,fl_he3,fl_he4,fl_he5,fl_hn1,fl_hn2,fl_hw1,fl_hw2,fl_hw3,fl_hw4,fl_hw5,fl_hwa1,fl_hwa2,fl_hwa3,fl_lt1,fl_lt10,fl_lt11,fl_lt2,fl_lt3,fl_lt4,fl_lt5,fl_lt6,fl_lt7,fl_lt8,fl_lt9,fl_pre1,fl_pre10,fl_pre2,fl_pre3,fl_pre4,fl_pre5,fl_pre6,fl_pre7,fl_pre8,fl_pre9,fl_th1,fl_th10,fl_th11,fl_th2,fl_th3,fl_th4,fl_th5,fl_th6,fl_th7,fl_th8,fl_th9,k0_i0,k0_i1,k0_i2,k0_s,k0_tip,k0_x0,k0_x1,k0_x2,k10_i0,k10_i1,k10_i2,k10_s,k10_tip,k10_x0,k10_x1,k10_x2,k11_i0,k11_i1,k11_i2,k11_s,k11_tip,k11_x0,k11_x1,k11_x2,k12_i0,k12_i1,k12_i2,k12_s,k12_tip,k12_x0,k12_x1,k12_x2,k13_i0,k13_i1,k13_i2,k13_s,k13_tip,k13_x0,k13_x1,k13_x2,k14_i0,k14_i1,k14_i2,k14_s,k14_tip,k14_x0,k14_x1,k14_x2,k15_i0,k15_i1,k15_i2,k15_s,k15_tip,k15_x0,k15_x1,k15_x2,k16_i0,k16_i1,k16_i2,k16_s,k16_tip,k16_x0,k16_x1,k16_x2,k17_i0,k17_i1,k17_i2,k17_s,k17_tip,k17_x0,k17_x1,k17_x2,k18_i0,k18_i1,k18_i2,k18_s,k18_tip,k18_x0,k18_x1,k18_x2,k19_i0,k19_i1,k19_i2,k19_s,k19_tip,k19_x0,k19_x1,k19_x2,k1_i0,k1_i1,k1_i2,k1_s,k1_tip,k1_x0,k1_x1,k1_x2,k20_i0,k20_i1,k20_i2,k20_s,k20_tip,k20_x0,k20_x1,k20_x2,k21_i0,k21_i1,k21_i2,k21_s,k21_tip,k21_x0,k21_x1,k21_x2,k22_i0,k22_i1,k22_i2,k22_s,k22_tip,k22_x0,k22_x1,k22_x2,k23_i0,k23_i1,k23_i2,k23_s,k23_tip,k23_x0,k23_x1,k23_x2,k24_i0,k24_i1,k24_i2,k24_s,k24_tip,k24_x0,k24_x1,k24_x2,k2_i0,k2_i1,k2_i2,k2_s,k2_tip,k2_x0,k2_x1,k2_x2,k3_i0,k3_i1,k3_i2,k3_s,k3_tip,k3_x0,k3_x1,k3_x2,k4_i0,k4_i1,k4_i2,k4_s,k4_tip,k4_x0,k4_x1,k4_x2,k5_i0,k5_i1,k5_i2,k5_s,k5_tip,k5_x0,k5_x1,k5_x2,k6_i0,k6_i1,k6_i2,k6_s,k6_tip,k6_x0,k6_x1,k6_x2,k7_i0,k7_i1,k7_i2,k7_s,k7_tip,k7_x0,k7_x1,k7_x2,k8_i0,k8_i1,k8_i2,k8_s,k8_tip,k8_x0,k8_x1,k8_x2,k9_i0,k9_i1,k9_i2,k9_s,k9_tip,k9_x0,k9_x1,k9_x2,r_ans_o,r_ans_x,r_end,r_kk_lead,r_kk_ng,r_kk_o,r_kk_ok,r_kk_x,r_n1,r_n2,r_n3,r_next,r_ng,r_ok,sil1,sil2,sil3,sil5,sil8,t0_e,t0_q,t0_t,t100_e,t100_q,t100_t,t101_e,t101_q,t101_t,t102_e,t102_q,t102_t,t103_e,t103_q,t103_t,t104_e,t104_q,t104_t,t105_e,t105_q,t105_t,t106_e,t106_q,t106_t,t107_e,t107_q,t107_t,t108_e,t108_q,t108_t,t109_e,t109_q,t109_t,t10_e,t10_q,t10_t,t110_e,t110_q,t110_t,t111_e,t111_q,t111_t,t112_e,t112_q,t112_t,t113_e,t113_q,t113_t,t114_e,t114_q,t114_t,t115_e,t115_q,t115_t,t116_e,t116_q,t116_t,t117_e,t117_q,t117_t,t118_e,t118_q,t118_t,t119_e,t119_q,t119_t,t11_e,t11_q,t11_t,t120_e,t120_q,t120_t,t121_e,t121_q,t121_t,t122_e,t122_q,t122_t,t123_e,t123_q,t123_t,t124_e,t124_q,t124_t,t125_e,t125_q,t125_t,t126_e,t126_q,t126_t,t127_e,t127_q,t127_t,t128_e,t128_q,t128_t,t129_e,t129_q,t129_t,t12_e,t12_q,t12_t,t130_e,t130_q,t130_t,t131_e,t131_q,t131_t,t132_e,t132_q,t132_t,t133_e,t133_q,t133_t,t134_e,t134_q,t134_t,t135_e,t135_q,t135_t,t136_e,t136_q,t136_t,t137_e,t137_q,t137_t,t138_e,t138_q,t138_t,t139_e,t139_q,t139_t,t13_e,t13_q,t13_t,t140_e,t140_q,t140_t,t141_e,t141_q,t141_t,t142_e,t142_q,t142_t,t143_e,t143_q,t143_t,t144_e,t144_q,t144_t,t145_e,t145_q,t145_t,t146_e,t146_q,t146_t,t147_e,t147_q,t147_t,t148_e,t148_q,t148_t,t149_e,t149_q,t149_t,t14_e,t14_q,t14_t,t150_e,t150_q,t150_t,t151_e,t151_q,t151_t,t152_e,t152_q,t152_t,t153_e,t153_q,t153_t,t154_e,t154_q,t154_t,t155_e,t155_q,t155_t,t156_e,t156_q,t156_t,t157_e,t157_q,t157_t,t158_e,t158_q,t158_t,t159_e,t159_q,t159_t,t15_e,t15_q,t15_t,t160_e,t160_q,t160_t,t161_e,t161_q,t161_t,t162_e,t162_q,t162_t,t163_e,t163_q,t163_t,t164_e,t164_q,t164_t,t165_e,t165_q,t165_t,t166_e,t166_q,t166_t,t167_e,t167_q,t167_t,t168_e,t168_q,t168_t,t169_e,t169_q,t169_t,t16_e,t16_q,t16_t,t170_e,t170_q,t170_t,t171_e,t171_q,t171_t,t172_e,t172_q,t172_t,t173_e,t173_q,t173_t,t174_e,t174_q,t174_t,t175_e,t175_q,t175_t,t176_e,t176_q,t176_t,t177_e,t177_q,t177_t,t178_e,t178_q,t178_t,t179_e,t179_q,t179_t,t17_e,t17_q,t17_t,t180_e,t180_q,t180_t,t181_e,t181_q,t181_t,t182_e,t182_q,t182_t,t183_e,t183_q,t183_t,t184_e,t184_q,t184_t,t185_e,t185_q,t185_t,t186_e,t186_q,t186_t,t187_e,t187_q,t187_t,t188_e,t188_q,t188_t,t189_e,t189_q,t189_t,t18_e,t18_q,t18_t,t190_e,t190_q,t190_t,t191_e,t191_q,t191_t,t192_e,t192_q,t192_t,t193_e,t193_q,t193_t,t194_e,t194_q,t194_t,t195_e,t195_q,t195_t,t196_e,t196_q,t196_t,t197_e,t197_q,t197_t,t198_e,t198_q,t198_t,t199_e,t199_q,t199_t,t19_e,t19_q,t19_t,t1_e,t1_q,t1_t,t200_e,t200_q,t200_t,t201_e,t201_q,t201_t,t202_e,t202_q,t202_t,t203_e,t203_q,t203_t,t204_e,t204_q,t204_t,t205_e,t205_q,t205_t,t206_e,t206_q,t206_t,t207_e,t207_q,t207_t,t208_e,t208_q,t208_t,t209_e,t209_q,t209_t,t20_e,t20_q,t20_t,t210_e,t210_q,t210_t,t211_e,t211_q,t211_t,t212_e,t212_q,t212_t,t213_e,t213_q,t213_t,t214_e,t214_q,t214_t,t215_e,t215_q,t215_t,t216_e,t216_q,t216_t,t217_e,t217_q,t217_t,t218_e,t218_q,t218_t,t219_e,t219_q,t219_t,t21_e,t21_q,t21_t,t220_e,t220_q,t220_t,t221_e,t221_q,t221_t,t222_e,t222_q,t222_t,t223_e,t223_q,t223_t,t224_e,t224_q,t224_t,t225_e,t225_q,t225_t,t226_e,t226_q,t226_t,t227_e,t227_q,t227_t,t228_e,t228_q,t228_t,t229_e,t229_q,t229_t,t22_e,t22_q,t22_t,t230_e,t230_q,t230_t,t231_e,t231_q,t231_t,t232_e,t232_q,t232_t,t233_e,t233_q,t233_t,t234_e,t234_q,t234_t,t235_e,t235_q,t235_t,t236_e,t236_q,t236_t,t237_e,t237_q,t237_t,t238_e,t238_q,t238_t,t239_e,t239_q,t239_t,t23_e,t23_q,t23_t,t240_e,t240_q,t240_t,t241_e,t241_q,t241_t,t242_e,t242_q,t242_t,t24_e,t24_q,t24_t,t25_e,t25_q,t25_t,t26_e,t26_q,t26_t,t27_e,t27_q,t27_t,t28_e,t28_q,t28_t,t29_e,t29_q,t29_t,t2_e,t2_q,t2_t,t30_e,t30_q,t30_t,t31_e,t31_q,t31_t,t32_e,t32_q,t32_t,t33_e,t33_q,t33_t,t34_e,t34_q,t34_t,t35_e,t35_q,t35_t,t36_e,t36_q,t36_t,t37_e,t37_q,t37_t,t38_e,t38_q,t38_t,t39_e,t39_q,t39_t,t3_e,t3_q,t3_t,t40_e,t40_q,t40_t,t41_e,t41_q,t41_t,t42_e,t42_q,t42_t,t43_e,t43_q,t43_t,t44_e,t44_q,t44_t,t45_e,t45_q,t45_t,t46_e,t46_q,t46_t,t47_e,t47_q,t47_t,t48_e,t48_q,t48_t,t49_e,t49_q,t49_t,t4_e,t4_q,t4_t,t50_e,t50_q,t50_t,t51_e,t51_q,t51_t,t52_e,t52_q,t52_t,t53_e,t53_q,t53_t,t54_e,t54_q,t54_t,t55_e,t55_q,t55_t,t56_e,t56_q,t56_t,t57_e,t57_q,t57_t,t58_e,t58_q,t58_t,t59_e,t59_q,t59_t,t5_e,t5_q,t5_t,t60_e,t60_q,t60_t,t61_e,t61_q,t61_t,t62_e,t62_q,t62_t,t63_e,t63_q,t63_t,t64_e,t64_q,t64_t,t65_e,t65_q,t65_t,t66_e,t66_q,t66_t,t67_e,t67_q,t67_t,t68_e,t68_q,t68_t,t69_e,t69_q,t69_t,t6_e,t6_q,t6_t,t70_e,t70_q,t70_t,t71_e,t71_q,t71_t,t72_e,t72_q,t72_t,t73_e,t73_q,t73_t,t74_e,t74_q,t74_t,t75_e,t75_q,t75_t,t76_e,t76_q,t76_t,t77_e,t77_q,t77_t,t78_e,t78_q,t78_t,t79_e,t79_q,t79_t,t7_e,t7_q,t7_t,t80_e,t80_q,t80_t,t81_e,t81_q,t81_t,t82_e,t82_q,t82_t,t83_e,t83_q,t83_t,t84_e,t84_q,t84_t,t85_e,t85_q,t85_t,t86_e,t86_q,t86_t,t87_e,t87_q,t87_t,t88_e,t88_q,t88_t,t89_e,t89_q,t89_t,t8_e,t8_q,t8_t,t90_e,t90_q,t90_t,t91_e,t91_q,t91_t,t92_e,t92_q,t92_t,t93_e,t93_q,t93_t,t94_e,t94_q,t94_t,t95_e,t95_q,t95_t,t96_e,t96_q,t96_t,t97_e,t97_q,t97_t,t98_e,t98_q,t98_t,t99_e,t99_q,t99_t,t9_e,t9_q,t9_t,x0_e,x0_q,x0_t,x100_e,x100_q,x100_t,x101_e,x101_q,x101_t,x102_e,x102_q,x102_t,x103_e,x103_q,x103_t,x104_e,x104_q,x104_t,x105_e,x105_q,x105_t,x106_e,x106_q,x106_t,x107_e,x107_q,x107_t,x108_e,x108_q,x108_t,x109_e,x109_q,x109_t,x10_e,x10_q,x10_t,x110_e,x110_q,x110_t,x111_e,x111_q,x111_t,x112_e,x112_q,x112_t,x113_e,x113_q,x113_t,x114_e,x114_q,x114_t,x115_e,x115_q,x115_t,x116_e,x116_q,x116_t,x117_e,x117_q,x117_t,x118_e,x118_q,x118_t,x119_e,x119_q,x119_t,x11_e,x11_q,x11_t,x120_e,x120_q,x120_t,x121_e,x121_q,x121_t,x122_e,x122_q,x122_t,x123_e,x123_q,x123_t,x124_e,x124_q,x124_t,x125_e,x125_q,x125_t,x126_e,x126_q,x126_t,x127_e,x127_q,x127_t,x128_e,x128_q,x128_t,x129_e,x129_q,x129_t,x12_e,x12_q,x12_t,x130_e,x130_q,x130_t,x131_e,x131_q,x131_t,x132_e,x132_q,x132_t,x133_e,x133_q,x133_t,x134_e,x134_q,x134_t,x135_e,x135_q,x135_t,x136_e,x136_q,x136_t,x137_e,x137_q,x137_t,x138_e,x138_q,x138_t,x139_e,x139_q,x139_t,x13_e,x13_q,x13_t,x140_e,x140_q,x140_t,x141_e,x141_q,x141_t,x142_e,x142_q,x142_t,x143_e,x143_q,x143_t,x144_e,x144_q,x144_t,x145_e,x145_q,x145_t,x146_e,x146_q,x146_t,x147_e,x147_q,x147_t,x148_e,x148_q,x148_t,x149_e,x149_q,x149_t,x14_e,x14_q,x14_t,x150_e,x150_q,x150_t,x151_e,x151_q,x151_t,x152_e,x152_q,x152_t,x153_e,x153_q,x153_t,x154_e,x154_q,x154_t,x155_e,x155_q,x155_t,x156_e,x156_q,x156_t,x157_e,x157_q,x157_t,x158_e,x158_q,x158_t,x159_e,x159_q,x159_t,x15_e,x15_q,x15_t,x160_e,x160_q,x160_t,x161_e,x161_q,x161_t,x162_e,x162_q,x162_t,x163_e,x163_q,x163_t,x164_e,x164_q,x164_t,x165_e,x165_q,x165_t,x166_e,x166_q,x166_t,x167_e,x167_q,x167_t,x168_e,x168_q,x168_t,x169_e,x169_q,x169_t,x16_e,x16_q,x16_t,x170_e,x170_q,x170_t,x171_e,x171_q,x171_t,x172_e,x172_q,x172_t,x173_e,x173_q,x173_t,x174_e,x174_q,x174_t,x175_e,x175_q,x175_t,x176_e,x176_q,x176_t,x177_e,x177_q,x177_t,x178_e,x178_q,x178_t,x179_e,x179_q,x179_t,x17_e,x17_q,x17_t,x180_e,x180_q,x180_t,x181_e,x181_q,x181_t,x182_e,x182_q,x182_t,x183_e,x183_q,x183_t,x184_e,x184_q,x184_t,x185_e,x185_q,x185_t,x186_e,x186_q,x186_t,x187_e,x187_q,x187_t,x188_e,x188_q,x188_t,x189_e,x189_q,x189_t,x18_e,x18_q,x18_t,x190_e,x190_q,x190_t,x191_e,x191_q,x191_t,x192_e,x192_q,x192_t,x193_e,x193_q,x193_t,x194_e,x194_q,x194_t,x195_e,x195_q,x195_t,x196_e,x196_q,x196_t,x197_e,x197_q,x197_t,x198_e,x198_q,x198_t,x199_e,x199_q,x199_t,x19_e,x19_q,x19_t,x1_e,x1_q,x1_t,x200_e,x200_q,x200_t,x201_e,x201_q,x201_t,x202_e,x202_q,x202_t,x203_e,x203_q,x203_t,x204_e,x204_q,x204_t,x205_e,x205_q,x205_t,x206_e,x206_q,x206_t,x207_e,x207_q,x207_t,x208_e,x208_q,x208_t,x209_e,x209_q,x209_t,x20_e,x20_q,x20_t,x210_e,x210_q,x210_t,x211_e,x211_q,x211_t,x212_e,x212_q,x212_t,x213_e,x213_q,x213_t,x214_e,x214_q,x214_t,x215_e,x215_q,x215_t,x216_e,x216_q,x216_t,x217_e,x217_q,x217_t,x218_e,x218_q,x218_t,x219_e,x219_q,x219_t,x21_e,x21_q,x21_t,x220_e,x220_q,x220_t,x221_e,x221_q,x221_t,x222_e,x222_q,x222_t,x223_e,x223_q,x223_t,x224_e,x224_q,x224_t,x225_e,x225_q,x225_t,x226_e,x226_q,x226_t,x227_e,x227_q,x227_t,x228_e,x228_q,x228_t,x229_e,x229_q,x229_t,x22_e,x22_q,x22_t,x230_e,x230_q,x230_t,x231_e,x231_q,x231_t,x232_e,x232_q,x232_t,x233_e,x233_q,x233_t,x234_e,x234_q,x234_t,x235_e,x235_q,x235_t,x236_e,x236_q,x236_t,x237_e,x237_q,x237_t,x238_e,x238_q,x238_t,x239_e,x239_q,x239_t,x23_e,x23_q,x23_t,x240_e,x240_q,x240_t,x241_e,x241_q,x241_t,x242_e,x242_q,x242_t,x243_e,x243_q,x243_t,x244_e,x244_q,x244_t,x245_e,x245_q,x245_t,x246_e,x246_q,x246_t,x247_e,x247_q,x247_t,x248_e,x248_q,x248_t,x249_e,x249_q,x249_t,x24_e,x24_q,x24_t,x250_e,x250_q,x250_t,x251_e,x251_q,x251_t,x252_e,x252_q,x252_t,x253_e,x253_q,x253_t,x254_e,x254_q,x254_t,x255_e,x255_q,x255_t,x256_e,x256_q,x256_t,x257_e,x257_q,x257_t,x258_e,x258_q,x258_t,x259_e,x259_q,x259_t,x25_e,x25_q,x25_t,x260_e,x260_q,x260_t,x261_e,x261_q,x261_t,x262_e,x262_q,x262_t,x263_e,x263_q,x263_t,x264_e,x264_q,x264_t,x265_e,x265_q,x265_t,x266_e,x266_q,x266_t,x267_e,x267_q,x267_t,x268_e,x268_q,x268_t,x269_e,x269_q,x269_t,x26_e,x26_q,x26_t,x270_e,x270_q,x270_t,x271_e,x271_q,x271_t,x272_e,x272_q,x272_t,x273_e,x273_q,x273_t,x274_e,x274_q,x274_t,x275_e,x275_q,x275_t,x276_e,x276_q,x276_t,x277_e,x277_q,x277_t,x278_e,x278_q,x278_t,x279_e,x279_q,x279_t,x27_e,x27_q,x27_t,x280_e,x280_q,x280_t,x281_e,x281_q,x281_t,x282_e,x282_q,x282_t,x283_e,x283_q,x283_t,x284_e,x284_q,x284_t,x285_e,x285_q,x285_t,x286_e,x286_q,x286_t,x287_e,x287_q,x287_t,x288_e,x288_q,x288_t,x289_e,x289_q,x289_t,x28_e,x28_q,x28_t,x290_e,x290_q,x290_t,x291_e,x291_q,x291_t,x292_e,x292_q,x292_t,x293_e,x293_q,x293_t,x294_e,x294_q,x294_t,x295_e,x295_q,x295_t,x296_e,x296_q,x296_t,x297_e,x297_q,x297_t,x298_e,x298_q,x298_t,x299_e,x299_q,x299_t,x29_e,x29_q,x29_t,x2_e,x2_q,x2_t,x300_e,x300_q,x300_t,x301_e,x301_q,x301_t,x302_e,x302_q,x302_t,x303_e,x303_q,x303_t,x304_e,x304_q,x304_t,x305_e,x305_q,x305_t,x306_e,x306_q,x306_t,x307_e,x307_q,x307_t,x308_e,x308_q,x308_t,x309_e,x309_q,x309_t,x30_e,x30_q,x30_t,x310_e,x310_q,x310_t,x311_e,x311_q,x311_t,x312_e,x312_q,x312_t,x313_e,x313_q,x313_t,x314_e,x314_q,x314_t,x315_e,x315_q,x315_t,x316_e,x316_q,x316_t,x317_e,x317_q,x317_t,x318_e,x318_q,x318_t,x319_e,x319_q,x319_t,x31_e,x31_q,x31_t,x320_e,x320_q,x320_t,x321_e,x321_q,x321_t,x322_e,x322_q,x322_t,x323_e,x323_q,x323_t,x324_e,x324_q,x324_t,x325_e,x325_q,x325_t,x326_e,x326_q,x326_t,x327_e,x327_q,x327_t,x328_e,x328_q,x328_t,x329_e,x329_q,x329_t,x32_e,x32_q,x32_t,x330_e,x330_q,x330_t,x331_e,x331_q,x331_t,x332_e,x332_q,x332_t,x333_e,x333_q,x333_t,x334_e,x334_q,x334_t,x335_e,x335_q,x335_t,x336_e,x336_q,x336_t,x337_e,x337_q,x337_t,x338_e,x338_q,x338_t,x339_e,x339_q,x339_t,x33_e,x33_q,x33_t,x340_e,x340_q,x340_t,x341_e,x341_q,x341_t,x342_e,x342_q,x342_t,x343_e,x343_q,x343_t,x344_e,x344_q,x344_t,x345_e,x345_q,x345_t,x346_e,x346_q,x346_t,x347_e,x347_q,x347_t,x348_e,x348_q,x348_t,x349_e,x349_q,x349_t,x34_e,x34_q,x34_t,x350_e,x350_q,x350_t,x351_e,x351_q,x351_t,x352_e,x352_q,x352_t,x353_e,x353_q,x353_t,x354_e,x354_q,x354_t,x355_e,x355_q,x355_t,x356_e,x356_q,x356_t,x357_e,x357_q,x357_t,x358_e,x358_q,x358_t,x359_e,x359_q,x359_t,x35_e,x35_q,x35_t,x360_e,x360_q,x360_t,x361_e,x361_q,x361_t,x362_e,x362_q,x362_t,x363_e,x363_q,x363_t,x364_e,x364_q,x364_t,x365_e,x365_q,x365_t,x366_e,x366_q,x366_t,x367_e,x367_q,x367_t,x368_e,x368_q,x368_t,x369_e,x369_q,x369_t,x36_e,x36_q,x36_t,x370_e,x370_q,x370_t,x371_e,x371_q,x371_t,x372_e,x372_q,x372_t,x373_e,x373_q,x373_t,x374_e,x374_q,x374_t,x375_e,x375_q,x375_t,x376_e,x376_q,x376_t,x377_e,x377_q,x377_t,x378_e,x378_q,x378_t,x379_e,x379_q,x379_t,x37_e,x37_q,x37_t,x380_e,x380_q,x380_t,x381_e,x381_q,x381_t,x382_e,x382_q,x382_t,x383_e,x383_q,x383_t,x384_e,x384_q,x384_t,x385_e,x385_q,x385_t,x386_e,x386_q,x386_t,x387_e,x387_q,x387_t,x388_e,x388_q,x388_t,x389_e,x389_q,x389_t,x38_e,x38_q,x38_t,x390_e,x390_q,x390_t,x391_e,x391_q,x391_t,x392_e,x392_q,x392_t,x393_e,x393_q,x393_t,x394_e,x394_q,x394_t,x395_e,x395_q,x395_t,x396_e,x396_q,x396_t,x397_e,x397_q,x397_t,x398_e,x398_q,x398_t,x399_e,x399_q,x399_t,x39_e,x39_q,x39_t,x3_e,x3_q,x3_t,x400_e,x400_q,x400_t,x401_e,x401_q,x401_t,x402_e,x402_q,x402_t,x403_e,x403_q,x403_t,x404_e,x404_q,x404_t,x405_e,x405_q,x405_t,x406_e,x406_q,x406_t,x407_e,x407_q,x407_t,x408_e,x408_q,x408_t,x409_e,x409_q,x409_t,x40_e,x40_q,x40_t,x410_e,x410_q,x410_t,x411_e,x411_q,x411_t,x412_e,x412_q,x412_t,x413_e,x413_q,x413_t,x414_e,x414_q,x414_t,x415_e,x415_q,x415_t,x416_e,x416_q,x416_t,x417_e,x417_q,x417_t,x418_e,x418_q,x418_t,x419_e,x419_q,x419_t,x41_e,x41_q,x41_t,x420_e,x420_q,x420_t,x421_e,x421_q,x421_t,x422_e,x422_q,x422_t,x423_e,x423_q,x423_t,x424_e,x424_q,x424_t,x425_e,x425_q,x425_t,x426_e,x426_q,x426_t,x427_e,x427_q,x427_t,x428_e,x428_q,x428_t,x429_e,x429_q,x429_t,x42_e,x42_q,x42_t,x430_e,x430_q,x430_t,x431_e,x431_q,x431_t,x432_e,x432_q,x432_t,x433_e,x433_q,x433_t,x434_e,x434_q,x434_t,x435_e,x435_q,x435_t,x436_e,x436_q,x436_t,x437_e,x437_q,x437_t,x438_e,x438_q,x438_t,x439_e,x439_q,x439_t,x43_e,x43_q,x43_t,x440_e,x440_q,x440_t,x441_e,x441_q,x441_t,x442_e,x442_q,x442_t,x443_e,x443_q,x443_t,x444_e,x444_q,x444_t,x445_e,x445_q,x445_t,x446_e,x446_q,x446_t,x447_e,x447_q,x447_t,x448_e,x448_q,x448_t,x449_e,x449_q,x449_t,x44_e,x44_q,x44_t,x450_e,x450_q,x450_t,x451_e,x451_q,x451_t,x452_e,x452_q,x452_t,x453_e,x453_q,x453_t,x454_e,x454_q,x454_t,x455_e,x455_q,x455_t,x456_e,x456_q,x456_t,x457_e,x457_q,x457_t,x458_e,x458_q,x458_t,x459_e,x459_q,x459_t,x45_e,x45_q,x45_t,x460_e,x460_q,x460_t,x461_e,x461_q,x461_t,x462_e,x462_q,x462_t,x463_e,x463_q,x463_t,x464_e,x464_q,x464_t,x465_e,x465_q,x465_t,x466_e,x466_q,x466_t,x467_e,x467_q,x467_t,x468_e,x468_q,x468_t,x469_e,x469_q,x469_t,x46_e,x46_q,x46_t,x47_e,x47_q,x47_t,x48_e,x48_q,x48_t,x49_e,x49_q,x49_t,x4_e,x4_q,x4_t,x50_e,x50_q,x50_t,x51_e,x51_q,x51_t,x52_e,x52_q,x52_t,x53_e,x53_q,x53_t,x54_e,x54_q,x54_t,x55_e,x55_q,x55_t,x56_e,x56_q,x56_t,x57_e,x57_q,x57_t,x58_e,x58_q,x58_t,x59_e,x59_q,x59_t,x5_e,x5_q,x5_t,x60_e,x60_q,x60_t,x61_e,x61_q,x61_t,x62_e,x62_q,x62_t,x63_e,x63_q,x63_t,x64_e,x64_q,x64_t,x65_e,x65_q,x65_t,x66_e,x66_q,x66_t,x67_e,x67_q,x67_t,x68_e,x68_q,x68_t,x69_e,x69_q,x69_t,x6_e,x6_q,x6_t,x70_e,x70_q,x70_t,x71_e,x71_q,x71_t,x72_e,x72_q,x72_t,x73_e,x73_q,x73_t,x74_e,x74_q,x74_t,x75_e,x75_q,x75_t,x76_e,x76_q,x76_t,x77_e,x77_q,x77_t,x78_e,x78_q,x78_t,x79_e,x79_q,x79_t,x7_e,x7_q,x7_t,x80_e,x80_q,x80_t,x81_e,x81_q,x81_t,x82_e,x82_q,x82_t,x83_e,x83_q,x83_t,x84_e,x84_q,x84_t,x85_e,x85_q,x85_t,x86_e,x86_q,x86_t,x87_e,x87_q,x87_t,x88_e,x88_q,x88_t,x89_e,x89_q,x89_t,x8_e,x8_q,x8_t,x90_e,x90_q,x90_t,x91_e,x91_q,x91_t,x92_e,x92_q,x92_t,x93_e,x93_q,x93_t,x94_e,x94_q,x94_t,x95_e,x95_q,x95_t,x96_e,x96_q,x96_t,x97_e,x97_q,x97_t,x98_e,x98_q,x98_t,x99_e,x99_q,x99_t,x9_e,x9_q,x9_t";const AUDIO_BYTES=75588667;
 /* ===== 文章問題 [分野, 正解(true=○), 問題文, 解説, 標識キー(任意)] ===== */
 const TF = [
 // ---------- 信号・合図 ----------
@@ -1475,6 +1485,335 @@ function speak(t){
 }
 function stopSpeak(){ if(canSpeak()) try{ speechSynthesis.cancel(); }catch(e){} }
 
+/* ===== 冥鳴ひまりの音声（VOICEVOX）再生 =====
+   AUDIO_NAMES / AUDIO_BYTES はビルド時に埋め込み。音声は audio/<名前>.m4a
+   キューの1項目：{clip:"t5_q", text:"…"}（クリップが無い・失敗したら端末の声で text を読む）／{sil:秒} */
+const AUDIO_CACHE = "gakka-audio-v1";
+const AUDIO_SET = new Set(typeof AUDIO_NAMES!=="undefined" ? AUDIO_NAMES.split(",") : []);
+const AU = {el:null, q:[], gen:0, onDone:null, blobs:new Map(), unlocked:false, paused:false};
+
+function hasHimari(){ return AUDIO_SET.size>0; }
+function useHimari(){ return hasHimari() && (store.settings.engine||"himari")==="himari"; }
+function canVoice(){ return useHimari() || canSpeak(); }
+function audioEl(){
+  if(!AU.el){ AU.el = new Audio(); AU.el.preload="auto"; try{ AU.el.preservesPitch=true; AU.el.webkitPreservesPitch=true; }catch(e){} }
+  return AU.el;
+}
+/* iPhoneは最初の再生をタップの中で行う必要があるので、最初のタップで無音を鳴らして解錠しておく */
+const SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+function unlockAudio(){
+  if(AU.unlocked) return; AU.unlocked=true;
+  try{ const el=audioEl(); el.src=SILENT_WAV; const p=el.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){}
+}
+document.addEventListener("touchend", unlockAudio, {passive:true});
+document.addEventListener("click", unlockAudio);
+
+function clipURL(name){ return "audio/"+name+".m4a"; }
+function clipBlob(name){
+  if(AU.blobs.has(name)) return AU.blobs.get(name);
+  const p = fetch(clipURL(name)).then(r=>{ if(!r.ok) throw new Error("http"); return r.blob(); })
+    .then(b=>URL.createObjectURL(b));
+  p.catch(()=>AU.blobs.delete(name));
+  AU.blobs.set(name,p);
+  if(AU.blobs.size>40){ const k=AU.blobs.keys().next().value; const old=AU.blobs.get(k); AU.blobs.delete(k); old.then(u=>URL.revokeObjectURL(u)).catch(()=>{}); }
+  return p;
+}
+function silName(s){ return "sil"+String(s).replace(".","_"); }
+function prefetch(){
+  if(!useHimari()) return;
+  AU.q.slice(0,3).forEach(it=>{ const n = it.clip&&AUDIO_SET.has(it.clip) ? it.clip : it.sil&&AUDIO_SET.has(silName(it.sil)) ? silName(it.sil) : null; if(n) clipBlob(n); });
+}
+function wait(ms,g){ return new Promise(r=>{ const t0=Date.now(); const f=()=>{ if(g!==AU.gen||Date.now()-t0>=ms) r(); else setTimeout(f,100); }; f(); }); }
+function playClip(name,g){
+  return clipBlob(name).then(url=>new Promise((res,rej)=>{
+    if(g!==AU.gen) return res();
+    const el=audioEl();
+    const done=()=>{ el.onended=el.onerror=null; clearInterval(chk); res(); };
+    const chk=setInterval(()=>{ if(g!==AU.gen) done(); },250);
+    el.onended=done; el.onerror=()=>{ el.onended=el.onerror=null; clearInterval(chk); rej(new Error("play")); };
+    el.src=url; el.playbackRate=Number(store.settings.hrate||1)*(AU.rateMul||1);
+    const p=el.play(); if(p&&p.catch) p.catch(e=>{ el.onended=el.onerror=null; clearInterval(chk); rej(e); });
+  }));
+}
+function speakP(text,g){
+  return new Promise(res=>{
+    if(!canSpeak()||g!==AU.gen) return res();
+    try{
+      const u=new SpeechSynthesisUtterance(toSpeech(text)); u.lang="ja-JP";
+      const v=pickVoice(); if(v) u.voice=v;
+      u.rate=store.settings.rate||1.05; u.pitch=store.settings.pitch||1;
+      let fin=false; const end=()=>{ if(!fin){ fin=true; clearInterval(chk); res(); } };
+      const t0=Date.now(), lim=4000+String(text).length*400;  // onendが来ない端末向けの保険
+      const chk=setInterval(()=>{ if(g!==AU.gen||Date.now()-t0>lim) end(); },250);
+      u.onend=end; u.onerror=end; speechSynthesis.speak(u);
+    }catch(e){ res(); }
+  });
+}
+async function runQueue(g){
+  while(g===AU.gen){
+    while(AU.paused && g===AU.gen) await wait(200,g);
+    if(g!==AU.gen) return;
+    const it=AU.q.shift();
+    if(!it){ const f=AU.onDone; AU.onDone=null; if(f) f(); return; }
+    prefetch();
+    try{
+      if(it.fn){ it.fn(); continue; }
+      if(it.sil){
+        let n=Math.max(1,Math.round(it.sil)); const parts=[];
+        for(const c of [8,5,3,2,1]) while(n>=c){ parts.push(c); n-=c; }
+        if(parts.length>1){ AU.q.unshift(...parts.slice(1).map(x=>({sil:x}))); it.sil=parts[0]; }
+        else it.sil=parts[0];
+        if(useHimari()&&AUDIO_SET.has(silName(it.sil))){ try{ await playClip(silName(it.sil),g); continue; }catch(e){} }
+        await wait(it.sil*1000,g); continue;
+      }
+      if(useHimari() && it.clip && AUDIO_SET.has(it.clip)){
+        try{ await playClip(it.clip,g); continue; }catch(e){}
+      }
+      if(it.text) await speakP(it.text,g);
+    }catch(e){}
+  }
+}
+function playQueue(items,onDone){
+  stopAudio(); const g=AU.gen;
+  AU.q=items.filter(Boolean); AU.onDone=onDone||null; AU.paused=false;
+  runQueue(g);
+}
+function stopAudio(){
+  AU.gen++; AU.q=[]; AU.onDone=null; AU.paused=false;
+  if(AU.el){ try{ AU.el.pause(); AU.el.onended=AU.el.onerror=null; }catch(e){} }
+  if(canSpeak()) try{ speechSynthesis.cancel(); }catch(e){}
+}
+function pauseAudio(on){
+  AU.paused=on;
+  if(AU.el){ try{ if(on) AU.el.pause(); else if(AU.el.src&&!AU.el.ended&&AU.el.currentTime>0) AU.el.play(); }catch(e){} }
+  if(canSpeak()) try{ on?speechSynthesis.pause():speechSynthesis.resume(); }catch(e){}
+}
+
+/* ===== 問題ごとの読み上げ内容 ===== */
+function itemsTFQuestion(q){ return [{clip:q.id+"_q", text:q.q}]; }
+function itemsTFAnswer(q,ok,opt){
+  opt=opt||{};
+  const a=[];
+  if(ok!==null&&ok!==undefined) a.push({clip:ok?"r_ok":"r_ng", text:ok?"正解。":"ざんねん。"});
+  a.push({clip:q.ans?"r_ans_o":"r_ans_x", text:"答えは、"+(q.ans?"マル":"バツ")+"。"});
+  if(q.exp){ a.push({sil:1}); a.push({clip:q.id+"_e", text:"ポイント。"+q.exp}); }
+  if(q.trap){ a.push({sil:1}); a.push({clip:q.id+"_t", text:"ひっかけ注意。"+q.trap}); }
+  return a;
+}
+const NTH=["ひとつめ","ふたつめ","みっつめ"];
+function oiOf(it,j){ return it.oi===undefined?j:it.oi; }
+function itemsKKQuestion(q){
+  const a=[{clip:q.id+"_s", text:"危険予測。"+q.s}, {sil:1}, {clip:"r_kk_lead", text:"次の3つは、マルか、バツか。"}];
+  q.items.forEach((it,j)=>{ a.push({sil:1}); a.push({clip:"r_n"+(j+1), text:NTH[j]+"。"}); a.push({clip:q.id+"_i"+oiOf(it,j), text:it.q}); });
+  return a;
+}
+function itemsKKAnswer(q,ok){
+  const a=[];
+  if(ok!==null&&ok!==undefined) a.push({clip:ok?"r_kk_ok":"r_kk_ng", text:ok?"3つとも正解。":"ざんねん。"});
+  q.items.forEach((it,j)=>{
+    a.push({sil:1}); a.push({clip:"r_n"+(j+1), text:NTH[j]+"。"});
+    a.push({clip:it.ans?"r_kk_o":"r_kk_x", text:"これは、"+(it.ans?"マル":"バツ")+"。"});
+    a.push({clip:q.id+"_x"+oiOf(it,j), text:it.exp});
+  });
+  if(q.tip){ a.push({sil:1}); a.push({clip:q.id+"_tip", text:"考え方のコツ。"+q.tip}); }
+  return a;
+}
+function itemsMemo(ci){ const g=COMPARE[ci]; return g?[{sil:1},{clip:"c"+ci, text:"比べて覚えよう。"+g.memo}]:[]; }
+function itemsFlashFront(i){ const f=FLASH[i]; return [{clip:"f"+i+"_q", text:f[1]+"は？"}]; }
+function itemsFlashBack(i){ const f=FLASH[i]; return [{clip:"f"+i+"_a", text:"答えは、"+f[2]+"。"}]; }
+
+/* ===== 音声のダウンロード（オフライン用） ===== */
+let DL = {running:false, done:0, total:0, err:0};
+async function audioCachedCount(){
+  try{ const c=await caches.open(AUDIO_CACHE); return (await c.keys()).length; }catch(e){ return 0; }
+}
+async function downloadAudio(){
+  if(DL.running||!("caches" in window)) return;
+  const names=[...AUDIO_SET]; DL={running:true, done:0, total:names.length, err:0}; showDL();
+  try{
+    const c=await caches.open(AUDIO_CACHE);
+    const have=new Set((await c.keys()).map(r=>decodeURIComponent(new URL(r.url).pathname.split("/").pop())));
+    let k=0;
+    const worker=async()=>{
+      while(k<names.length){
+        const n=names[k++];
+        if(!have.has(n+".m4a")){ try{ const r=await fetch(clipURL(n),{cache:"no-store"}); if(!r.ok) throw 0; await c.put(clipURL(n), r); }catch(e){ DL.err++; } }
+        DL.done++; if(DL.done%20===0||DL.done===DL.total) showDL();
+      }
+    };
+    await Promise.all([1,2,3,4,5,6].map(worker));
+  }catch(e){ DL.err++; }
+  DL.running=false; showDL(true);
+}
+async function deleteAudio(){
+  if(!confirm("ダウンロードした音声を削除しますか？（端末の空き容量が増えます）")) return;
+  try{ await caches.delete(AUDIO_CACHE); }catch(e){}
+  showDL(true);
+}
+async function showDL(final){
+  const el=document.getElementById("dlStatus"); if(!el) return;
+  if(DL.running){ el.innerHTML=`ダウンロード中… ${DL.done} / ${DL.total}<div class="mbar"><i style="width:${DL.total?DL.done/DL.total*100:0}%"></i></div>`; return; }
+  const n=await audioCachedCount(); const all=AUDIO_SET.size;
+  const btn=document.getElementById("dlBtn");
+  if(n>=all){ el.innerHTML=`✓ 音声はダウンロード済み（${all}本）。ネットがなくても声で読み上げます。 <button class="link" onclick="deleteAudio()">削除</button>`; if(btn) btn.style.display="none"; }
+  else{
+    el.innerHTML = (n?`${n} / ${all}本 保存済み。`:"まだ保存されていません。")+(DL.err&&final?`（${DL.err}本 失敗。電波の良い所でもう一度押してください）`:"")+" ネットにつながっていれば、保存しなくても声は流れます。";
+    if(btn) btn.style.display="";
+  }
+}
+function audioMB(){ return typeof AUDIO_BYTES!=="undefined" ? Math.round(AUDIO_BYTES/1048576) : 0; }
+
+/* ===== 聞き流しモード（寝る前用） =====
+   問題 →（考える間）→ 答え → ポイント → ひっかけ → 次の問題… を自動で読み続ける。タイマーが来たら、その問題を読み終えてから止まる */
+let L = null;
+const LSRC = [
+  ["all","全問ランダム"],["weak","苦手な問題"],["due","今日の復習"],["kouka","効果測定の形式"],["kk","危険予測"],["flash","数字カード"]
+];
+function listenPool(src){
+  if(src==="flash") return shuffle(FLASH.map((f,i)=>({flash:i})));
+  if(src==="kk") return shuffle(BANK_KK);
+  let pool;
+  if(src==="weak") pool = everything().filter(q=>isWeak(q.id));
+  else if(src==="due") pool = everything().filter(q=>isDue(q.id));
+  else if(src==="kouka") pool = tfAll().filter(q=>q.kouka);
+  else pool = tfAll();
+  return shuffle(pool.filter(q=>!q.sign));
+}
+function listenCount(src){ return listenPool(src).length; }
+function setListen(k,v){ store.settings[k]=v; save(); }
+function listenHome(){
+  const st=store.settings, src=st.listenSrc||"all";
+  return `
+    <h2>聞き流し（寝る前に）</h2>
+    <div class="sub">画面に触らなくても「問題 → 考える間 → 答え → ポイント → ひっかけ」を自動で読み続けます。図を見る問題は除きます。</div>
+    <div class="chips lsrc">${LSRC.map(([k,n])=>`<button class="chip ${k===src?"on":""}" onclick="setListen('listenSrc','${k}');home()">${n}（${listenCount(k)}）</button>`).join("")}</div>
+    <label class="vrow">タイマー <select onchange="setListen('listenMin',Number(this.value))">${[0,15,30,45,60,90].map(m=>`<option value="${m}" ${(st.listenMin??30)===m?"selected":""}>${m?m+"分で止める":"止めない"}</option>`).join("")}</select></label>
+    <label class="vrow">考える間 <select onchange="setListen('listenThink',Number(this.value))">${[3,5,8].map(s=>`<option value="${s}" ${(st.listenThink||5)===s?"selected":""}>${s}秒</option>`).join("")}</select></label>
+    <button class="btn listen-btn" ${listenCount(src)?"":"disabled"} onclick="startListen()">聞き流しを始める<small>${canVoice()?"画面を消しても続きます":"この端末では読み上げが使えません"}</small></button>`;
+}
+function startListen(){
+  stopAudio(); stopTimer(); S=null;
+  const st=store.settings, src=st.listenSrc||"all";
+  const list=listenPool(src); if(!list.length) return;
+  L={src, list, i:0, phase:"q", paused:false, finished:false,
+     end: (st.listenMin??30) ? Date.now()+(st.listenMin??30)*60000 : null, count:0, t0:Date.now(), lastLt:-9, lastFl:"", lastHist:-9, lastFast:false};
+  try{
+    if("mediaSession" in navigator){
+      navigator.mediaSession.metadata = new MediaMetadata({title:"聞き流し", artist:"学科試験対策", album:"VOICEVOX:冥鳴ひまり"});
+      navigator.mediaSession.setActionHandler("pause",()=>listenPause(true));
+      navigator.mediaSession.setActionHandler("play",()=>listenPause(false));
+      navigator.mediaSession.setActionHandler("nexttrack",()=>listenSkip());
+    }
+  }catch(e){}
+  L.tid=setInterval(()=>{ const el=document.getElementById("ltimer"); if(el&&L) el.textContent=listenLeft(); },1000);
+  listenStep();
+}
+function listenLeft(){
+  if(!L||!L.end) return "タイマーなし";
+  const ms=Math.max(0,L.end-Date.now()); return "残り "+fmt(ms);
+}
+function listenCur(){ return L.list[L.i]; }
+/* 合いの手（人っぽい間）。タイマー後半ほど、間を長く・声をゆっくり・様子をうかがう */
+const FL={"pre": [["fl_pre1", "じゃあ、次ね。"], ["fl_pre2", "次は、これ。"], ["fl_pre3", "えーっと、次は"], ["fl_pre4", "はい、いくよ。"], ["fl_pre5", "それじゃあ、次。"], ["fl_pre6", "次の問題、いくね。"], ["fl_pre7", "お次は、これ。"], ["fl_pre8", "よし、次ね。"], ["fl_pre9", "さて、と。次は"], ["fl_pre10", "続けていくよ。"]], "th": [["fl_th1", "どっちだと思う？"], ["fl_th2", "わかるかな？"], ["fl_th3", "うーん"], ["fl_th4", "ゆっくり考えてね。"], ["fl_th5", "ここ、ひっかけかも。"], ["fl_th6", "さあ、どっち？"], ["fl_th7", "マルかな、バツかな。"], ["fl_th8", "ちょっと、考えてみて。"], ["fl_th9", "落ち着いて、読んでみてね。"], ["fl_th10", "ふふ、迷うよね。"], ["fl_th11", "どこが、ポイントかな。"]], "an": [["fl_an1", "これはね、"], ["fl_an2", "正解は"], ["fl_an3", "答え、いくね。"], ["fl_an4", "えっとね、"], ["fl_an5", "答えはね、"], ["fl_an6", "うん、これは、"], ["fl_an7", "せーの、"]], "af": [["fl_af1", "なるほどね。"], ["fl_af2", "覚えておいてね。"], ["fl_af3", "ここ、よく出るよ。"], ["fl_af4", "うん、うん。"], ["fl_af5", "大事なところだね。"], ["fl_af6", "よし、ひとつ覚えた。"], ["fl_af7", "ちゃんと、覚えておこうね。"], ["fl_af8", "うんうん、いい感じ。"], ["fl_af9", "試験でも、出るかもね。"]], "lt": [["fl_lt1", "まだ、起きてる？"], ["fl_lt2", "眠くなったら、そのまま寝ちゃっていいからね。"], ["fl_lt3", "ゆっくり、いこうね。"], ["fl_lt4", "ふぁ、次ね。"], ["fl_lt5", "あと、少しだけ。"], ["fl_lt6", "聞こえてるかな"], ["fl_lt7", "目は、閉じたままでいいよ。"], ["fl_lt8", "もう、半分寝てるかな。"], ["fl_lt9", "そのまま、聞いてるだけでいいよ。"], ["fl_lt10", "力を抜いて、ね。"], ["fl_lt11", "ゆっくり、息をしてね。"]], "hw": [["fl_hw1", "あ、これ、前に間違えてたやつだ。"], ["fl_hw2", "この問題、この前ひっかかったよね。"], ["fl_hw3", "リベンジの問題だよ。"], ["fl_hw4", "これは、苦手なやつかも。"], ["fl_hw5", "今度は、大丈夫かな。"]], "hwa": [["fl_hwa1", "今度は、覚えられたかな。"], ["fl_hwa2", "次は、間違えないようにね。"], ["fl_hwa3", "ここ、もう一回覚えておこう。"]], "he": [["fl_he1", "これは、簡単だよね。"], ["fl_he2", "これは、もう覚えてるかな。"], ["fl_he3", "得意なやつだね。"], ["fl_he4", "これは、楽勝かも。"], ["fl_he5", "前も、ばっちりだったね。"]], "ff": [["fl_ff1", "さらっと、いくね。"], ["fl_ff2", "これは、早送りで。"], ["fl_ff3", "サクッと、確認ね。"], ["fl_ff4", "答えだけ、いっちゃおう。"]], "hn": [["fl_hn1", "これは、はじめての問題かな。"], ["fl_hn2", "初めて見る問題だね。"]]};
+function rnd(p){ return Math.random()<p; }
+function fl(k){ const a=FL[k]; let x=a[Math.floor(Math.random()*a.length)];
+  if(L&&L.lastFl===x[0]) x=a[(a.indexOf(x)+1)%a.length]; if(L) L.lastFl=x[0]; return {clip:x[0], text:x[1]}; }
+/* 進み具合 0〜1（タイマーなしなら60分で半分まで） */
+function listenProg(){ if(!L) return 0; if(!L.end) return Math.min(0.5,(Date.now()-L.t0)/(120*60000)); return Math.min(1,(Date.now()-L.t0)/(L.end-L.t0)); }
+/* これまでの成績から：new=初めて／wrong=前回まちがい／easy=何度も正解／normal */
+function histOf(it){
+  if(it.flash!==undefined) return store.flash[it.flash]? "easy" : "normal";
+  const st=stat(it.id), n=st.c+st.w;
+  if(!n) return "new";
+  if(st.last===false) return "wrong";
+  if(isMastered(it.id) || (n>=2 && st.c/n>=0.8 && st.last===true)) return "easy";
+  return "normal";
+}
+function listenStep(){
+  if(!L) return;
+  if(L.end && Date.now()>=L.end){
+    L.phase="end"; renderListen();
+    playQueue([{sil:3},{clip:"r_end", text:"今日はここまで。おやすみなさい。"}], ()=>{ if(L){ L.finished=true; renderListen(); } });
+    return;
+  }
+  if(L.i>=L.list.length){ L.list=listenPool(L.src); L.i=0; if(!L.list.length){ listenStop(); return; } }
+  const it=listenCur(), think=store.settings.listenThink||5;
+  const p=listenProg(), late=Math.max(0,(p-0.5)*2);        // 後半だけ 0→1
+  const slow=1+late*0.7;                                    // 間は最後に1.7倍まで
+  const gap=x=>({sil:x*slow});
+  /* 成績にあわせたひと言・早送り。よく正解する問題は多いので、言う頻度に間隔をあけて散らす */
+  const h=histOf(it), since=L.count-L.lastHist;
+  let say=null, fast=false;
+  if(h==="wrong" && since>=2 && rnd(0.65)) say="hw";
+  else if(h==="easy"){
+    fast = rnd(L.lastFast? 0.3 : 0.55);
+    if(since>=4 && rnd(0.3)) say = fast&&rnd(0.5) ? "ff" : "he";
+    else if(fast && since>=2 && rnd(0.35)) say="ff";
+  }
+  else if(h==="new" && since>=5 && rnd(0.15)) say="hn";
+  if(say) L.lastHist=L.count;
+  L.lastFast=fast;
+  AU.rateMul=(1-late*0.1)*(fast?1.1:1);                     // 後半は1割ゆっくり、早送りは1割速く
+  L.phase="q"; renderListen();
+  const showA={fn:()=>{ if(L){ L.phase="a"; renderListen(); } }};
+  let items=[];
+  if(L.count){
+    items.push(gap(fast?1:1.5));
+    if(late>0.1 && L.count-L.lastLt>=3 && rnd(0.25+late*0.5)){ items.push(fl("lt"), gap(4)); L.lastLt=L.count; }
+    if(!say) items.push(rnd(0.5)? fl("pre") : {clip:"r_next", text:"次の問題。"}, {sil:1});
+  }
+  if(say) items.push(fl(say), {sil:1});
+  const thinkPart=()=>{ if(fast) return [{sil:1.5}]; const t=think*slow; return rnd(0.4)? [{sil:t*0.5}, fl("th"), {sil:t*0.5}] : [{sil:t}]; };
+  const stretch=a=>a.map(x=>x.sil?gap(x.sil):x);
+  if(it.flash!==undefined){
+    items=items.concat(itemsFlashFront(it.flash), thinkPart(), [showA], itemsFlashBack(it.flash));
+  }else if(it.kind==="kk"){
+    let ans=stretch(itemsKKAnswer(it,null)); if(fast) ans=ans.filter(x=>!(x.clip&&/_tip$/.test(x.clip)));
+    items=items.concat(itemsKKQuestion(it), thinkPart(), [showA], ans);
+  }else{
+    let ans=stretch(itemsTFAnswer(it,null));
+    if(fast && rnd(0.7)) ans=ans.slice(0,1);                 // 早送りは答えだけ（たまにポイントも）
+    else if(fast) ans=ans.filter(x=>!(x.clip&&/_t$/.test(x.clip)));
+    if(rnd(0.5)){ ans[0]={clip:it.ans?"a_o":"a_x", text:it.ans?"マル。":"バツ。"}; ans.unshift(fl("an")); }
+    items=items.concat(itemsTFQuestion(it), thinkPart(), [showA], ans);
+    if(h==="wrong" && rnd(0.5)) items.push({sil:1}, fl("hwa"));
+    else if(!fast && rnd(0.3)) items.push({sil:1}, fl("af"));
+  }
+  items.push(gap(fast?1:2));
+  playQueue(items, ()=>{ if(!L) return; L.i++; L.count++; listenStep(); });
+}
+function listenPause(on){ if(!L) return; L.paused=on; pauseAudio(on); renderListen(); }
+function listenSkip(){ if(!L||L.finished) return; stopAudio(); L.i++; L.count++; listenStep(); }
+function listenStop(){ if(L&&L.tid) clearInterval(L.tid); L=null; AU.rateMul=1; stopAudio(); home(); }
+function renderListen(){
+  if(!L) return;
+  const it = L.i<L.list.length ? listenCur() : null, showA = L.phase==="a";
+  let body="";
+  if(L.phase==="end"||L.finished){
+    body=`<div class="lq center">おやすみなさい</div><div class="sub center">${L.count}問 聞きました</div>`;
+  }else if(it && it.flash!==undefined){
+    const f=FLASH[it.flash];
+    body=`<span class="qcat">${esc(f[0])}</span><div class="lq">${esc(f[1])}</div>${showA?`<div class="la">${esc(f[2])}</div>`:""}`;
+  }else if(it && it.kind==="kk"){
+    body=`<span class="qcat">危険予測</span><div class="lq small">${esc(it.s)}</div>
+      ${it.items.map((x,j)=>`<div class="lk">(${j+1}) ${esc(x.q)} ${showA?`<b class="${x.ans?"pass":"fail"}">${ox(x.ans)}</b>`:""}</div>`).join("")}`;
+  }else if(it){
+    body=`<span class="qcat">${esc(it.cat)}</span><div class="lq">${esc(it.q)}</div>
+      ${showA?`<div class="la ${it.ans?"pass":"fail"}">${ox(it.ans)}</div>${it.exp?`<div class="lexp">${esc(it.exp)}</div>`:""}${it.trap?`<div class="lexp trap">${esc(it.trap)}</div>`:""}`:""}`;
+  }
+  app.innerHTML=`
+    <div class="listen">
+    <div class="topbar"><button class="link" onclick="listenStop()">← 終わる</button><span>聞き流し　${L.count+1}問目</span><span id="ltimer" class="tr">${listenLeft()}</span></div>
+    <div class="card lcard">${body}</div>
+    ${L.finished?`<button class="btn center" onclick="listenStop()">ホームへ戻る</button>`:`
+    <div class="row">
+      <button class="btn ghost center" onclick="listenPause(${!L.paused})">${L.paused?"▶ 再開":"❚❚ 一時停止"}</button>
+      <button class="btn ghost center" onclick="listenSkip()">次へ ▶▶</button>
+    </div>`}
+    <div class="sub center">${useHimari()?"音声：VOICEVOX:冥鳴ひまり":""}</div>
+    </div>`;
+}
+
 /* ===== データ整形 ===== */
 const BANK_TF = TF.map((q,i)=>({id:"t"+i,kind:"tf",cat:q[0],ans:q[1],q:q[2],exp:q[3],sign:q[4]||null,trap:TRAP[i]||"",hard:false}))
   .concat(EXTRA.map((x,i)=>({id:"x"+i,kind:"tf",cat:x.c,ans:x.a,q:x.q,exp:x.e,sign:x.s||null,trap:x.t||"",hard:!!x.h,list:!!x.l,kouka:!!x.k})));
@@ -1484,7 +1823,7 @@ const BANK_KK = KIKEN.map((k,i)=>({id:"k"+i,kind:"kk",cat:"危険予測",s:k.s,t
 const KEY = "gakkaQuiz.tokyo.v2";
 let store = {stats:{}, custom:[], settings:{}, srs:{}, flash:{}};
 try{ const s = localStorage.getItem(KEY); if(s) store = Object.assign(store, JSON.parse(s)); }catch(e){}
-store.settings = Object.assign({answerMode:"instant", timeLimit:false, includeHard:false, tts:false, voice:"", rate:1.05, pitch:1}, store.settings||{});
+store.settings = Object.assign({answerMode:"instant", timeLimit:false, includeHard:false, tts:false, voice:"", rate:1.05, pitch:1, engine:"himari", hrate:1, listenSrc:"all", listenMin:30, listenThink:5}, store.settings||{});
 store.srs = store.srs||{}; store.flash = store.flash||{};
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
 
@@ -1534,7 +1873,7 @@ function explainKKTip(q){
 
 /* ===== ホーム ===== */
 function home(){
-  stopTimer(); S=null;
+  stopTimer(); S=null; if(L){ if(L.tid) clearInterval(L.tid); L=null; AU.rateMul=1; stopAudio(); }
   const tf = tfAll(), all = everything(), st = store.settings;
   let c=0,w=0; Object.values(store.stats).forEach(s=>{c+=s.c;w+=s.w;});
   const rate = c+w ? Math.round(c/(c+w)*100)+"%" : "—";
@@ -1563,14 +1902,23 @@ function home(){
     </div>
     <div class="sub">練習・分野別・苦手復習に適用されます。模擬試験は常に全問解答してから採点します。</div>
 
-    <label class="toggle"><input type="checkbox" ${st.tts?"checked":""} onchange="setTTS(this.checked)"> 問題と解説を自動で読み上げる${canSpeak()?"":"（この端末では使えません）"}</label>
-    ${canSpeak()?`<details class="card voicebox"><summary>読み上げの声と速さ</summary>
+    <label class="toggle"><input type="checkbox" ${st.tts?"checked":""} onchange="setTTS(this.checked)"> 問題と解説を自動で読み上げる${canVoice()?"":"（この端末では使えません）"}</label>
+    <details class="card voicebox" ${hasHimari()&&!st.audioSeen?"open":""} ontoggle="if(this.open){store.settings.audioSeen=true;save();showDL()}"><summary>読み上げの声と速さ</summary>
+      ${hasHimari()?`<div class="seg small">
+        <button class="${useHimari()?"on":""}" onclick="setEngine('himari')">冥鳴ひまり</button>
+        <button class="${useHimari()?"":"on"}" onclick="setEngine('device')" ${canSpeak()?"":"disabled"}>端末の声</button></div>`:""}
+      ${useHimari()?`
+      <label class="vrow">速さ <input type="range" min="0.8" max="1.4" step="0.05" value="${st.hrate}" oninput="setHrate(this.value)"> <span id="hrateVal">${Number(st.hrate).toFixed(2)}倍</span></label>
+      <button class="btn ghost center" onclick="voiceTest()">試しに聞く</button>
+      <button class="btn center" id="dlBtn" onclick="downloadAudio()">音声をダウンロード（約${audioMB()}MB）<small>一度保存すれば、ネットがなくても声で読み上げます。Wi-Fiでの保存がおすすめ</small></button>
+      <div class="sub" id="dlStatus"></div>
+      <div class="sub">音声：VOICEVOX:冥鳴ひまり。自分で追加した問題は端末の声で読みます。</div>`:`
       <label class="vrow">声 <select id="voiceSel" onchange="setVoice(this.value)">${voiceOptions()}</select></label>
       <label class="vrow">速さ <input type="range" min="0.6" max="1.6" step="0.05" value="${st.rate}" oninput="setRate(this.value)"> <span id="rateVal">${Number(st.rate).toFixed(2)}倍</span></label>
       <label class="vrow">高さ <input type="range" min="0.6" max="1.6" step="0.05" value="${st.pitch}" oninput="setPitch(this.value)"> <span id="pitchVal">${Number(st.pitch).toFixed(2)}</span></label>
-      <button class="btn ghost center" onclick="speak('赤色の灯火の点滅信号では、一時停止しなければならない。正解はマル。')">試しに聞く</button>
-      <div class="sub">iPhoneに入っている日本語の声から選べます。声を増やすには、iPhoneの「設定」→「アクセシビリティ」→「読み上げコンテンツ」→「声」→「日本語」からダウンロードしてください（追加後はアプリを開き直すと一覧に出ます）。</div>
-    </details>`:""}
+      <button class="btn ghost center" onclick="voiceTest()">試しに聞く</button>
+      <div class="sub">iPhoneに入っている日本語の声から選べます。声を増やすには、iPhoneの「設定」→「アクセシビリティ」→「読み上げコンテンツ」→「声」→「日本語」からダウンロードしてください（追加後はアプリを開き直すと一覧に出ます）。</div>`}
+    </details>
     <label class="toggle strong"><input type="checkbox" ${st.includeHard?"checked":""} onchange="setHard(this.checked)"> 意地悪なひっかけ・奇問も出題する（${hardAll().length}問）</label>
     <div class="sub">オンにすると、練習・分野別・模擬試験のすべてに意地悪問題が混ざります。</div>
 
@@ -1592,6 +1940,8 @@ function home(){
     <h2>数字暗記カード</h2>
     <button class="btn ghost" onclick="startFlash(false)">カードで覚える<small>${FLASH.length}枚・めくって答える（覚えた ${FLASH.filter((f,i)=>store.flash[i]).length}枚）</small></button>
     <button class="btn ghost" ${FLASH.some((f,i)=>!store.flash[i])?"":"disabled"} onclick="startFlash(true)">まだ覚えていないカードだけ<small>${FLASH.filter((f,i)=>!store.flash[i]).length}枚</small></button>
+
+    ${listenHome()}
 
     <h2>分野別</h2>
     <div class="chips">${cats.map(ct=>`<button class="chip" data-cat="${esc(ct)}">${esc(ct)}（${tf.filter(q=>q.cat===ct).length}）</button>`).join("")}</div>
@@ -1656,12 +2006,13 @@ function home(){
     </div>
     <div class="card sub">
       <b>このアプリについて</b><br>
-      本番の試験問題は非公開のため、収録問題は道路交通法令・教本の内容と出題形式をもとに作成した予想問題です。2026年の改正（4月：自転車の側方通過ルール・自転車の青切符・受験年齢17歳6か月、9月：生活道路の法定速度30km/h）を反映しています。最終確認は教本と教習所の指導で行ってください。
+      本番の試験問題は非公開のため、収録問題は道路交通法令・教本の内容と出題形式をもとに作成した予想問題です。2026年の改正（4月：自転車の側方通過ルール・自転車の青切符・受験年齢17歳6か月、9月：生活道路の法定速度30km/h）を反映しています。最終確認は教本と教習所の指導で行ってください。<br>読み上げ音声：VOICEVOX:冥鳴ひまり
     </div>
     <button class="link" onclick="resetStats()">成績をリセット</button>
   `;
   app.querySelectorAll(".chip").forEach(b=>b.onclick=()=>startSet(shuffle(tfAll().filter(q=>q.cat===b.dataset.cat)), b.dataset.cat));
   window.scrollTo(0,0);
+  showDL();
 }
 function setMode(m){ store.settings.answerMode=m; save(); home(); }
 function setTimeLimit(v){ store.settings.timeLimit=v; save(); }
@@ -1671,15 +2022,18 @@ function voiceOptions(){
   if(!vs.length) return `<option value="">標準の声</option>`;
   return `<option value="" ${cur?"":"selected"}>標準の声</option>`+vs.map(v=>`<option value="${esc(v.voiceURI)}" ${v.voiceURI===cur?"selected":""}>${esc(v.name)}${v.localService===false?"（オンライン）":""}</option>`).join("");
 }
-function setVoice(v){ store.settings.voice=v; save(); speak("この声で読み上げます"); }
+function setVoice(v){ store.settings.voice=v; save(); voiceTest(); }
+function setEngine(v){ store.settings.engine=v; save(); stopAudio(); home(); const d=document.querySelector(".voicebox"); if(d) d.open=true; }
+function setHrate(v){ store.settings.hrate=Number(v); save(); const e=document.getElementById("hrateVal"); if(e) e.textContent=Number(v).toFixed(2)+"倍"; if(AU.el) AU.el.playbackRate=Number(v); }
+function voiceTest(){ const q=BANK_TF[0]; playQueue(itemsTFQuestion(q).concat([{sil:1}],itemsTFAnswer(q,null))); }
 function setRate(v){ store.settings.rate=Number(v); save(); const e=document.getElementById("rateVal"); if(e) e.textContent=Number(v).toFixed(2)+"倍"; }
 function setPitch(v){ store.settings.pitch=Number(v); save(); const e=document.getElementById("pitchVal"); if(e) e.textContent=Number(v).toFixed(2); }
 if(canSpeak()){ try{ speechSynthesis.onvoiceschanged=()=>{ const el=document.getElementById("voiceSel"); if(el) el.innerHTML=voiceOptions(); }; speechSynthesis.getVoices(); }catch(e){} }
-function setTTS(v){ store.settings.tts=v; save(); if(v) speak("読み上げをオンにしました"); else stopSpeak(); }
+function setTTS(v){ store.settings.tts=v; save(); if(v) voiceTest(); else stopAudio(); }
 
 /* ===== 出題開始 =====
    S.mode: "instant"（すぐ答えがわかる） / "batch"（全問解答） / "mock"（模擬試験＝全問解答＋合否） */
-function prepKK(list){ return list.map(q=>q.kind==="kk"?Object.assign({},q,{items:shuffle(q.items)}):q); }
+function prepKK(list){ return list.map(q=>q.kind==="kk"?Object.assign({},q,{items:shuffle(q.items.map((x,j)=>Object.assign({},x,{oi:j})))}):q); }
 function blankAns(list){ return list.map(q=>q.kind==="kk"?[null,null,null]:null); }
 function startSet(list,title){
   if(!list.length) return;
@@ -1691,7 +2045,7 @@ function startSet(list,title){
 function startCompare(i){
   const g=COMPARE[i]; const list=compareList(g);
   if(!list.length) return;
-  startSet(shuffle(list), "比較："+g.name); S.memo=g.memo; render();
+  startSet(shuffle(list), "比較："+g.name); S.memo=g.memo; S.cmpIdx=i; render();
 }
 function startMock(type){
   let list, minutes, pass, title;
@@ -1744,7 +2098,7 @@ function render(){
   const unans = isBatch() ? S.list.filter((qq,k)=>!answered(qq,S.ans[k])).length : 0;
   app.innerHTML = `
     <div class="topbar"><button class="link" onclick="quit()">← やめる</button>
-      <span>${esc(S.title)}　${S.i+1} / ${n}</span><span class="tr">${canSpeak()?`<button class="link spk" onclick="speakCurrent(true)" aria-label="読み上げ">🔊</button>`:""}<span id="timer"></span></span></div>
+      <span>${esc(S.title)}　${S.i+1} / ${n}</span><span class="tr">${canVoice()?`<button class="link spk" onclick="speakCurrent(true)" aria-label="読み上げ">🔊</button>`:""}<span id="timer"></span></span></div>
     <div class="bar"><i style="width:${S.i/n*100}%"></i></div>
     <div class="card">${body}</div>
     ${isBatch() ? `
@@ -1773,20 +2127,16 @@ function toggleUnsure(){
   }
   S.spoken = S.spoken; render();
 }
-function speakText(){
-  const q=S.list[S.i], a=S.ans[S.i], done=S.mode==="instant"&&S.checked[S.i];
-  if(q.kind==="tf"){
-    let t=q.q;
-    if(done) t=(a===q.ans?"正解。":"不正解。")+"正解は"+ox(q.ans)+"。"+(q.exp||"")+(q.trap?"。ひっかけポイント。"+q.trap:"");
-    return t;
-  }
-  if(done) return (isCorrect(q,a)?"3つとも正解。":"不正解。")+q.items.map((it,j)=>(j+1)+"番、正解は"+ox(it.ans)+"。"+it.exp).join("");
-  return q.s+"。"+q.items.map((it,j)=>(j+1)+"番。"+it.q).join("");
-}
 function speakCurrent(force){
-  const key = S.i+":"+(S.mode==="instant"&&S.checked[S.i]?"d":"q");
+  const done = S.mode==="instant"&&S.checked[S.i];
+  const key = S.i+":"+(done?"d":"q");
   if(!force && S.spoken===key) return;
-  S.spoken = key; speak(speakText());
+  S.spoken = key;
+  const q=S.list[S.i], a=S.ans[S.i];
+  let items = q.kind==="tf" ? (done? itemsTFAnswer(q,a===q.ans) : itemsTFQuestion(q))
+                            : (done? itemsKKAnswer(q,isCorrect(q,a)) : itemsKKQuestion(q));
+  if(done && S.cmpIdx!=null && !S.memoSpoken){ S.memoSpoken=true; items=items.concat(itemsMemo(S.cmpIdx)); }
+  playQueue(items);
 }
 
 /* ===== 操作 ===== */
@@ -1798,7 +2148,7 @@ function answerTF(v){
 function setKK(j,v){ S.ans[S.i][j]=v; render(); }
 function checkKK(){ const q=S.list[S.i]; S.checked[S.i]=true; S.snap[S.i]=snapOf(q.id); record(q,isCorrect(q,S.ans[S.i]),S.unsure[S.i]); save(); render(); }
 function go(k){ S.i=Math.max(0,Math.min(S.list.length-1,k)); render(); window.scrollTo(0,0); }
-function next(){ if(S.i<S.list.length-1){ S.i++; render(); window.scrollTo(0,0);} else { stopSpeak(); result(); } }
+function next(){ if(S.i<S.list.length-1){ S.i++; render(); window.scrollTo(0,0);} else { stopAudio(); result(); } }
 function finishConfirm(){
   const un = S.list.filter((q,k)=>!answered(q,S.ans[k])).length;
   if(un && !confirm(`未回答が${un}問あります。採点しますか？`)) return;
@@ -1812,7 +2162,7 @@ function finishBatch(){
 function quit(){
   if(S && isBatch() && !confirm("中断しますか？（この回の成績は記録されません）")) return;
   if(S && S.mode==="instant" && S.checked.some(Boolean) && confirm("ここまでの結果を表示しますか？")) { result(); return; }
-  stopSpeak(); home();
+  stopAudio(); home();
 }
 
 /* ===== 結果 ===== */
@@ -1877,14 +2227,14 @@ function startFlash(onlyNew){
 }
 function renderFlash(){
   if(!F.queue.length){
-    app.innerHTML = `<div class="topbar"><button class="link" onclick="stopSpeak();home()">← ホーム</button><span>数字暗記カード</span><span></span></div>
+    app.innerHTML = `<div class="topbar"><button class="link" onclick="stopAudio();home()">← ホーム</button><span>数字暗記カード</span><span></span></div>
       <div class="card center"><div class="big pass">完了</div><div>${F.total}枚すべて「覚えた」になりました。</div></div>
-      <button class="btn ghost center" onclick="stopSpeak();home()">ホームへ戻る</button>`;
+      <button class="btn ghost center" onclick="stopAudio();home()">ホームへ戻る</button>`;
     return;
   }
   const i=F.queue[0], f=FLASH[i];
   app.innerHTML = `
-    <div class="topbar"><button class="link" onclick="stopSpeak();home()">← やめる</button><span>覚えた ${F.done} / ${F.total}</span><span class="tr">${canSpeak()?`<button class="link spk" onclick="speak(flashText())">🔊</button>`:""}</span></div>
+    <div class="topbar"><button class="link" onclick="stopAudio();home()">← やめる</button><span>覚えた ${F.done} / ${F.total}</span><span class="tr">${canVoice()?`<button class="link spk" onclick="speakFlash()">🔊</button>`:""}</span></div>
     <div class="bar"><i style="width:${F.done/F.total*100}%"></i></div>
     <div class="card flash" onclick="flipFlash()">
       <span class="qcat">${esc(f[0])}</span>
@@ -1894,9 +2244,9 @@ function renderFlash(){
     ${F.shown?`<div class="row">
       <button class="btn ghost center" onclick="flashAgain()">もう一度</button>
       <button class="btn center" onclick="flashOK()">覚えた</button></div>`:""}`;
-  if(store.settings.tts) speak(flashText());
+  if(store.settings.tts) speakFlash();
 }
-function flashText(){ const f=FLASH[F.queue[0]]; return F.shown? f[2] : f[0]+"。"+f[1]; }
+function speakFlash(){ const i=F.queue[0]; playQueue(F.shown? itemsFlashBack(i) : itemsFlashFront(i)); }
 function flipFlash(){ if(!F.shown){ F.shown=true; renderFlash(); } }
 function flashOK(){ const i=F.queue.shift(); store.flash[i]=true; save(); F.done++; F.shown=false; renderFlash(); }
 function flashAgain(){ const i=F.queue.shift(); store.flash[i]=false; save(); F.queue.splice(Math.min(3,F.queue.length),0,i); F.shown=false; renderFlash(); }

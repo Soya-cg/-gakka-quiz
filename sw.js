@@ -1,5 +1,5 @@
 /* オフライン用サービスワーカー：一度開いたら全ファイルを端末に保存し、以後はネットなしで動く */
-const CACHE = "gakka-quiz-v11";
+const CACHE = "gakka-quiz-v12";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -8,7 +8,7 @@ self.addEventListener("install", e => {
 
 self.addEventListener("activate", e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE && !k.startsWith("gakka-audio")).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -16,8 +16,10 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then(hit =>
-      hit || fetch(e.request).catch(() => caches.match("./index.html"))
-    )
+    caches.match(e.request, { ignoreSearch: true }).then(hit => {
+      if (hit) return hit;
+      if (e.request.url.includes("/audio/")) return fetch(e.request);  // 音声は「音声をダウンロード」で別に保存
+      return fetch(e.request).catch(() => caches.match("./index.html"));
+    })
   );
 });
