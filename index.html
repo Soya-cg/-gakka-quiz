@@ -100,7 +100,26 @@ details summary{cursor:pointer;font-size:14px;color:var(--sub)}
 .toggle.strong{color:var(--text);font-weight:600;margin-top:12px}
 .hardbtn{border:2px solid var(--warn)}
 .kouka{border:2px solid var(--accent)}
-.sign svg.wide{height:80px}.sign.small svg.wide{height:44px}
+.sign svg.wide{height:80px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.unsure{border:1px solid var(--line);background:var(--card);color:var(--sub);border-radius:999px;padding:4px 12px;font-size:12px;font-family:inherit;cursor:pointer;flex-shrink:0}
+.unsure.on{border-color:var(--warn);color:var(--warn);background:var(--trapbg);font-weight:700}
+.tr{display:flex;align-items:center;gap:8px}
+.spk{font-size:18px;padding:0 2px}
+.mastery{margin:-4px 0 4px}
+.mbar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.mbar i{display:block;height:100%;background:var(--ok)}
+.review-btn{background:var(--ok)}
+.exp.cmpmemo{background:var(--okbg)}
+.exp.cmpmemo .lbl{color:var(--ok)}
+.chips.cmp .chip{font-size:13px}
+.flash .qcat{align-self:flex-start}
+.topbar>.link{white-space:nowrap;flex-shrink:0}
+.topbar>span:nth-child(2){flex:1;min-width:0;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr{flex-shrink:0;white-space:nowrap}
+.flash{min-height:220px;cursor:pointer;display:flex;flex-direction:column;gap:12px}
+.ffront{font-size:20px;font-weight:700;margin-top:8px}
+.fback{font-size:24px;font-weight:800;color:var(--accent);border-top:1px dashed var(--line);padding-top:12px}.sign.small svg.wide{height:44px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -1356,6 +1375,87 @@ const SIGNS = {
   center_yellow: road(`<line x1="0" y1="60" x2="200" y2="60" stroke="${YEL}" stroke-width="5"/>`+T(100,30,12,"対向車線","#e5e7eb")+T(100,96,12,"自車の車線","#e5e7eb"))
 };
 
+/* ===== 比較モード：取り違えやすい論点のグループ ===== */
+const COMPARE = [
+ {name:"駐停車・駐車禁止の距離", memo:"駐停車禁止：交差点・曲がり角・横断歩道・自転車横断帯は5m／踏切・安全地帯・バス停（運行時間中）は10m。駐車禁止：火災報知機1m／車庫などの出入口3m／消火栓・道路工事区域5m。右側の余地3.5m以上。",
+  test:q=>/\d+(\.\d+)?メートル(以内|以上)/.test(q.q)&&/(駐停車|駐車)/.test(q.q)},
+ {name:"点滅信号・矢印信号", memo:"赤の点滅＝一時停止。黄の点滅＝他の交通に注意して進める。黄色の矢印＝路面電車専用。右向きの青矢印でも、二段階右折の原付と軽車両は右折できない。",
+  test:q=>/(灯火の点滅|点滅信号|矢印信号|矢印が表示)/.test(q.q)},
+ {name:"駐車と停車の区別", memo:"停車＝人の乗り降り（時間に関係なし）・5分以内の荷物の積みおろし。駐車＝客待ち・荷待ち・人を待つ・5分を超える積みおろし・故障・運転者が離れてすぐ運転できない状態。",
+  test:q=>/(停車にあたる|駐車にあたる|停車として|駐車になる)/.test(q.q)},
+ {name:"坂・トンネル（追い越し／徐行／駐停車）", memo:"追い越し禁止：上り坂の頂上付近・急な下り坂・車両通行帯のないトンネル。徐行：上り坂の頂上付近・急な下り坂（トンネルは対象外）。駐停車禁止：坂の頂上付近・急な坂（上り下りとも）・トンネル全体。",
+  test:q=>/(上り坂|下り坂|頂上|トンネル)/.test(q.q)&&/(追い越|徐行|駐停車)/.test(q.q)},
+ {name:"合図の時期", memo:"右左折・転回＝その地点の30m手前。進路変更＝約3秒前。徐行・停止・後退＝その行為をしようとするとき。合図は行為が終わったらすぐやめる。",
+  test:q=>/合図/.test(q.q)&&/(30メートル|3秒|1秒|直前|切り始め|ときに)/.test(q.q)},
+ {name:"二輪のスロットルとブレーキ", memo:"カーブ＝手前で減速、途中はクラッチを切らずスロットルで加減。ぬかるみ・砂利道＝低速ギアでスロットル一定。ブレーキは前後同時。乾燥路は前輪やや強く、滑りやすい路面は後輪やや強く。数回に分けてかける。",
+  test:q=>/(スロットル|前輪ブレーキ|後輪ブレーキ)/.test(q.q)},
+ {name:"N・L・D・Pの使い分け", memo:"走行中のN＝×（エンジンブレーキが効かない）。例外はエンジンの回転が下がらないときだけN。加速車線＝Dのまま踏み込む（キックダウン）。下り坂・急な上り坂＝2やL。駐車＝P（坂道でも）。",
+  test:q=>/(ニュートラル|[NLDPR]に入れ|[NLDPR]の位置|セレクトレバー)/.test(q.q)},
+ {name:"赤い布・白い布", memo:"はみ出した荷物＝赤い布（夜間は赤色の灯火か反射器）。けん引ロープ＝白い布、間隔は5m以内。布はどちらも0.3m平方以上。",
+  test:q=>/(赤い布|白い布)/.test(q.q)||/(赤色|白色)の灯火を付け/.test(q.q)},
+ {name:"積み荷の高さ・大きさ", memo:"高さ：普通自動車3.8m、三輪・総排気量660cc以下の普通自動車2.5m、大型・普通自動二輪車2m。長さ・幅：車の1.2倍まで、はみ出しは前後・左右とも各10分の1まで。",
+  test:q=>/(積み荷|積む荷物|積載物)/.test(q.q)&&/(メートル|倍|はみ出)/.test(q.q)},
+ {name:"免許で運転できる車", memo:"普通免許＝普通・小型特殊・原付（二輪は不可）。大型特殊免許＝大型特殊・小型特殊・原付。小型特殊免許＝小型特殊だけ。大型免許でも大型特殊と二輪は不可。AT限定はAT車だけ。",
+  test:q=>/免許/.test(q.q)&&/運転(する|でき|して)/.test(q.q)&&/(普通|大型|小型特殊|二輪|AT限定)/.test(q.q)},
+ {name:"二人乗りの条件", memo:"原付は二人乗り不可。一般道路＝二輪免許1年以上。高速道路＝20歳以上かつ二輪免許3年以上。",
+  test:q=>/二人乗り/.test(q.q)},
+ {name:"緊急自動車への譲り方", memo:"交差点やその付近＝交差点を避け、左に寄って一時停止。それ以外の場所＝左に寄って進路を譲る（一時停止は義務ではない）。一方通行で左に寄るとかえって妨げになるときは右に寄る。",
+  test:q=>/緊急自動車/.test(q.q)},
+ {name:"優先通行帯と専用通行帯", memo:"優先通行帯＝普通自動車も通れるが、路線バス等が近づいたら出る（原付・小型特殊・軽車両は出なくてよい）。混雑で出られないなら初めから入らない。専用通行帯＝指定車以外は通れない（右左折・工事などは例外）。",
+  test:q=>/(優先通行帯|専用通行帯)/.test(q.q)},
+ {name:"路側帯の種類", memo:"白の実線1本：幅0.75m超なら中に入り、左に0.75m以上残して駐停車。実線＋破線（駐停車禁止路側帯）・実線2本（歩行者用）は中に入って駐停車できない。歩行者用路側帯は軽車両も通行できない。",
+  test:q=>/路側帯/.test(q.q)&&!/高速/.test(q.q)},
+ {name:"似た形の標識", memo:"斜線1本＝駐車禁止、×＝駐停車禁止。白い横棒＝車両進入禁止、斜線＝車両通行止め、×と「通行止」＝通行止め。逆三角形：赤地に白文字＝止まれ、白地に赤い縁・青文字＝徐行。数字に下線＝最低速度。三角が上下＝高さ、左右＝幅。丸い青に矢印＝指定方向外進行禁止、長方形＝一方通行。",
+  test:q=>!!q.sign&&["chusha","chuteisha","shinnyu","sharyodome","tsukodome","tomare","jokou","stopok","teishisen","max50","max30","min50","height","haba","weight","shitei","shitei2","shitei_up","ippou","yusen","kei_cross"].includes(q.sign)},
+ {name:"横断歩道まわり", memo:"人がいないことが明らかでなければ手前で止まれる速度。横断中・横断しようとする人がいれば一時停止。手前に止まっている車の横から前に出るときは一時停止。手前30m以内は追い越し・追い抜き禁止。前後5mは駐停車禁止。",
+  test:q=>/横断歩道/.test(q.q)&&/(一時停止|徐行|停止できる|追い|妨げ)/.test(q.q)}
+];
+function compareList(g){ return tfEvery().filter(g.test); }
+
+/* ===== 数字暗記カード ===== */
+const FLASH = [
+ ["駐停車禁止","交差点とその端から","5m以内"],["駐停車禁止","道路の曲がり角から","5m以内"],
+ ["駐停車禁止","横断歩道・自転車横断帯の前後","5m以内"],["駐停車禁止","踏切の前後","10m以内"],
+ ["駐停車禁止","安全地帯の左側とその前後","10m以内"],["駐停車禁止","バス・路面電車の停留所の標示板から","10m以内（運行時間中のみ）"],
+ ["駐車禁止","火災報知機から","1m以内"],["駐車禁止","駐車場・車庫などの自動車用出入口から","3m以内"],
+ ["駐車禁止","消火栓・指定消防水利の標識から","5m以内"],["駐車禁止","道路工事区域の端から","5m以内"],
+ ["駐車","車の右側に残す余地","3.5m以上"],["駐車","白の実線1本の路側帯で中に入れる幅","0.75mを超えるとき（左に0.75m以上残す）"],
+ ["駐車","同じ場所に続けて駐車してはいけない時間（車庫法）","昼間12時間以上・夜間8時間以上"],["駐車","自動車の保管場所","使用の本拠から2km以内（道路以外）"],
+ ["合図","右左折・転回の合図","30m手前"],["合図","進路変更の合図","約3秒前"],
+ ["追い越し","交差点・踏切・横断歩道の手前で追い越し禁止の範囲","30m以内"],["停止位置","交差点以外で停止線も横断歩道もない場所の手信号","警察官の1m手前"],
+ ["速度","一般道（中央線あり）の法定速度","60km/h"],["速度","中央線のない一般道路の法定速度（2026年9月〜）","30km/h"],
+ ["速度","高速道路の普通乗用車 最高／最低","100km/h／50km/h"],["速度","高速道路の大型貨物自動車（2024年4月〜）","90km/h"],
+ ["速度","高速道路の三輪の普通自動車","80km/h"],["速度","徐行の目安","おおむね10km/h以下"],
+ ["けん引","ロープでけん引するときの一般道路の最高速度","30km/h（2000kg以下を3倍以上の車で引くとき40km/h）"],["けん引","原付でけん引するときの最高速度","25km/h"],
+ ["けん引","けん引ロープの間隔と目印","5m以内・0.3m平方以上の白い布"],["けん引","けん引免許が必要になる重さ","車両総重量750kg超（故障車のロープけん引を除く）"],
+ ["積載","積み荷の長さ・幅","車の1.2倍まで"],["積載","積み荷の前後・左右のはみ出し","それぞれ10分の1まで"],
+ ["積載","積み荷の高さ（普通自動車）","地上から3.8m"],["積載","積み荷の高さ（三輪・総排気量660cc以下）","地上から2.5m"],
+ ["積載","積み荷の高さ（大型・普通自動二輪車）","地上から2m"],["積載","積載物の重さ 原付／自動二輪車","30kg／60kg"],
+ ["積載","制限を超えた荷物の目印","0.3m平方以上の赤い布（夜間は赤色の灯火か反射器）"],["乗車","12歳未満の子どもの換算","3人で大人2人"],
+ ["免許","初心運転者標識を付ける期間","免許を受けてから1年"],["免許","仮免許の有効期間","6か月"],
+ ["免許","仮免許練習の同乗者の条件","その車を運転できる免許を3年以上受けている人など"],["免許","大型二輪免許が必要な排気量","400cc超"],
+ ["免許","普通免許（2017年3月12日以降）の範囲","車両総重量3.5t未満・最大積載量2t未満・定員10人以下"],["免許","普通免許の受験と交付（2026年4月〜）","受験は17歳6か月から・交付は18歳から"],
+ ["二人乗り","一般道路での二人乗り","二輪免許1年以上"],["二人乗り","高速道路での二人乗り","20歳以上かつ二輪免許3年以上"],
+ ["その他","チャイルドシートが必要な年齢","6歳未満"],["その他","長時間運転の休憩の目安","2時間に1回"],
+ ["その他","スリップサインが出るタイヤの溝","1.6mm未満"],["その他","自家用乗用車の定期点検／事業用","1年ごと／3か月ごと"],
+ ["その他","自家用乗用車の車検の有効期間","新車3年・以後2年"],["その他","時速60kmで衝突したときの衝撃","約14m（ビル5階程度）から落ちたのと同じ"],
+ ["その他","高速道路100km/hの車間距離の目安（乾燥路）","約100m"],["灯火","夜間の駐停車で灯火が不要な条件","50m後方から見える場合"],
+ ["灯火","昼間でも灯火が必要な条件","トンネル・霧などで50m先が見えないとき"],["高齢者","高齢運転者標識","70歳以上（努力義務）"]
+];
+
+/* ===== 読み上げ ===== */
+function canSpeak(){ return typeof window!=="undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance!=="undefined"; }
+function toSpeech(t){
+  return String(t).replace(/○/g,"マル").replace(/×/g,"バツ").replace(/km\/h/g,"キロ").replace(/(\d)kg/g,"$1キログラム")
+    .replace(/(\d)cc/g,"$1シーシー").replace(/(\d)mm/g,"$1ミリ").replace(/(\d)m\b/g,"$1メートル").replace(/(\d)m(?=[^a-zA-Z])/g,"$1メートル")
+    .replace(/(\d)t\b/g,"$1トン").replace(/[（(]/g,"、").replace(/[）)]/g,"、").replace(/[／/]/g,"、");
+}
+function speak(t){
+  if(!canSpeak()) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(toSpeech(t)); u.lang="ja-JP"; u.rate=1.05; speechSynthesis.speak(u); }catch(e){}
+}
+function stopSpeak(){ if(canSpeak()) try{ speechSynthesis.cancel(); }catch(e){} }
+
 /* ===== データ整形 ===== */
 const BANK_TF = TF.map((q,i)=>({id:"t"+i,kind:"tf",cat:q[0],ans:q[1],q:q[2],exp:q[3],sign:q[4]||null,trap:TRAP[i]||"",hard:false}))
   .concat(EXTRA.map((x,i)=>({id:"x"+i,kind:"tf",cat:x.c,ans:x.a,q:x.q,exp:x.e,sign:x.s||null,trap:x.t||"",hard:!!x.h,list:!!x.l,kouka:!!x.k})));
@@ -1363,9 +1463,10 @@ const BANK_KK = KIKEN.map((k,i)=>({id:"k"+i,kind:"kk",cat:"危険予測",s:k.s,t
 
 /* ===== ストレージ ===== */
 const KEY = "gakkaQuiz.tokyo.v2";
-let store = {stats:{}, custom:[], settings:{}};
+let store = {stats:{}, custom:[], settings:{}, srs:{}, flash:{}};
 try{ const s = localStorage.getItem(KEY); if(s) store = Object.assign(store, JSON.parse(s)); }catch(e){}
-store.settings = Object.assign({answerMode:"instant", timeLimit:false, includeHard:false}, store.settings||{});
+store.settings = Object.assign({answerMode:"instant", timeLimit:false, includeHard:false, tts:false}, store.settings||{});
+store.srs = store.srs||{}; store.flash = store.flash||{};
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
 
 function tfEvery(){ return BANK_TF.concat(store.custom.map(c=>Object.assign({kind:"tf",sign:null,trap:"",hard:false},c))); }
@@ -1373,7 +1474,7 @@ function tfAll(){ return store.settings.includeHard ? tfEvery() : tfEvery().filt
 function hardAll(){ return tfEvery().filter(q=>q.hard); }
 function everything(){ return tfAll().concat(BANK_KK); }
 function stat(id){ return store.stats[id] || {c:0,w:0,last:null}; }
-function isWeak(id){ const s = stat(id); return s.w>0 && s.last===false; }
+function isWeak(id){ const s = stat(id); return s.last===false; }
 
 /* ===== 共通 ===== */
 const app = document.getElementById("app");
@@ -1387,7 +1488,21 @@ function isCorrect(q,a){
 }
 function points(q){ return q.kind==="kk" ? 2 : 1; }
 function answered(q,a){ return q.kind==="kk" ? Array.isArray(a) && a.every(v=>v===true||v===false) : (a===true||a===false); }
-function record(q,ok){ const s=stat(q.id); if(ok) s.c++; else s.w++; s.last=ok; store.stats[q.id]=s; }
+/* 間隔反復：box 0〜5、正解で次の間隔へ。不正解は当日中にもう一度。迷って正解は翌日 */
+const DAY = 86400000, INTERVALS = [0,1,3,7,14,30];
+function srsOf(id){ return store.srs[id] || null; }
+function isMastered(id){ const r=srsOf(id); return !!r && r.b>=3; }
+function isDue(id){ const r=srsOf(id); return !!r && r.d<=Date.now(); }
+function record(q,ok,unsure){
+  const s=stat(q.id); if(ok) s.c++; else s.w++; s.last = ok && !unsure; store.stats[q.id]=s;
+  const r = Object.assign({b:0,d:0}, store.srs[q.id]||{});
+  if(!ok){ r.b=0; r.d=Date.now(); }
+  else if(unsure){ r.b=Math.min(r.b,1); r.d=Date.now()+DAY; }
+  else { r.b=Math.min(r.b+1,5); r.d=Date.now()+INTERVALS[r.b]*DAY; }
+  store.srs[q.id]=r;
+}
+function snapOf(id){ return {st: store.stats[id]?Object.assign({},store.stats[id]):null, sr: store.srs[id]?Object.assign({},store.srs[id]):null}; }
+function restore(id,sn){ if(sn.st) store.stats[id]=sn.st; else delete store.stats[id]; if(sn.sr) store.srs[id]=sn.sr; else delete store.srs[id]; }
 
 /* 解説ブロック（正解のポイント＋ひっかけポイント） */
 function explainTF(q){
@@ -1405,6 +1520,8 @@ function home(){
   let c=0,w=0; Object.values(store.stats).forEach(s=>{c+=s.c;w+=s.w;});
   const rate = c+w ? Math.round(c/(c+w)*100)+"%" : "—";
   const weak = all.filter(q=>isWeak(q.id));
+  const due = all.filter(q=>isDue(q.id));
+  const mastered = all.filter(q=>isMastered(q.id)).length;
   const cats = [...new Set(tf.map(q=>q.cat))];
   const ORDER=['信号・合図','標識・標示','通行方法','速度・車間距離','交差点','追い越し・行き違い','自転車・二輪','歩行者等の保護','駐停車','踏切・坂道','高速道路','運転者の義務','乗車・積載','けん引','AT車の運転','MT車の運転','二輪車の運転','危険な場面・車の知識','事故・災害時'];
   cats.sort((a,b)=>(ORDER.indexOf(a)+1||99)-(ORDER.indexOf(b)+1||99));
@@ -1416,6 +1533,9 @@ function home(){
       <div><b>${rate}</b><span>正答率</span></div>
       <div><b>${weak.length}</b><span>苦手な問題</span></div>
     </div>
+    <div class="mastery"><div class="mbar"><i style="width:${all.length?mastered/all.length*100:0}%"></i></div>
+      <div class="sub">習得済み ${mastered} / ${all.length}問（3回続けて正解した問題）</div></div>
+    <button class="btn review-btn" ${due.length?"":"disabled"} onclick="startSet(shuffle(everything().filter(q=>isDue(q.id))),'今日の復習')">今日の復習 ${due.length}問<small>${due.length?"間違えた問題・迷った問題・そろそろ忘れる頃の問題を出題":"今日の復習はありません。解いた問題は、忘れかける頃にここへ出てきます"}</small></button>
 
     <h2>答え合わせの方法</h2>
     <div class="seg" role="group">
@@ -1424,6 +1544,7 @@ function home(){
     </div>
     <div class="sub">練習・分野別・苦手復習に適用されます。模擬試験は常に全問解答してから採点します。</div>
 
+    <label class="toggle"><input type="checkbox" ${st.tts?"checked":""} onchange="setTTS(this.checked)"> 問題と解説を自動で読み上げる${canSpeak()?"":"（この端末では使えません）"}</label>
     <label class="toggle strong"><input type="checkbox" ${st.includeHard?"checked":""} onchange="setHard(this.checked)"> 意地悪なひっかけ・奇問も出題する（${hardAll().length}問）</label>
     <div class="sub">オンにすると、練習・分野別・模擬試験のすべてに意地悪問題が混ざります。</div>
 
@@ -1437,6 +1558,14 @@ function home(){
     <button class="btn ghost" onclick="startSet(shuffle(BANK_KK),'危険予測')">危険予測問題<small>${BANK_KK.length}題・3つすべて正解で得点</small></button>
     <button class="btn ghost" ${weak.length?"":"disabled"} onclick="startSet(shuffle(everything().filter(q=>isWeak(q.id))),'苦手復習')">苦手な問題を復習<small>直近で間違えた ${weak.length}問（正解すると外れます）</small></button>
     <button class="btn ghost" onclick="startSet(shuffle(tfAll()),'全問題')">全問題<small>${tf.length}問をシャッフル</small></button>
+
+    <h2>比較モード</h2>
+    <div class="sub">取り違えやすい問題をまとめて出題し、答えるたびに違いを整理して表示します。</div>
+    <div class="chips cmp">${COMPARE.map((g,i)=>`<button class="chip" onclick="startCompare(${i})">${esc(g.name)}（${compareList(g).length}）</button>`).join("")}</div>
+
+    <h2>数字暗記カード</h2>
+    <button class="btn ghost" onclick="startFlash(false)">カードで覚える<small>${FLASH.length}枚・めくって答える（覚えた ${FLASH.filter((f,i)=>store.flash[i]).length}枚）</small></button>
+    <button class="btn ghost" ${FLASH.some((f,i)=>!store.flash[i])?"":"disabled"} onclick="startFlash(true)">まだ覚えていないカードだけ<small>${FLASH.filter((f,i)=>!store.flash[i]).length}枚</small></button>
 
     <h2>分野別</h2>
     <div class="chips">${cats.map(ct=>`<button class="chip" data-cat="${esc(ct)}">${esc(ct)}（${tf.filter(q=>q.cat===ct).length}）</button>`).join("")}</div>
@@ -1511,6 +1640,7 @@ function home(){
 function setMode(m){ store.settings.answerMode=m; save(); home(); }
 function setTimeLimit(v){ store.settings.timeLimit=v; save(); }
 function setHard(v){ store.settings.includeHard=v; save(); home(); }
+function setTTS(v){ store.settings.tts=v; save(); if(v) speak("読み上げをオンにしました"); else stopSpeak(); }
 
 /* ===== 出題開始 =====
    S.mode: "instant"（すぐ答えがわかる） / "batch"（全問解答） / "mock"（模擬試験＝全問解答＋合否） */
@@ -1520,8 +1650,13 @@ function startSet(list,title){
   if(!list.length) return;
   list = prepKK(list);
   const mode = store.settings.answerMode==="batch" ? "batch" : "instant";
-  S = {mode, title, list, i:0, ans:blankAns(list), checked:list.map(()=>false), start:Date.now()};
+  S = {mode, title, list, i:0, ans:blankAns(list), checked:list.map(()=>false), unsure:list.map(()=>false), snap:list.map(()=>null), start:Date.now(), memo:null, spoken:""};
   render(); startTimer();
+}
+function startCompare(i){
+  const g=COMPARE[i]; const list=compareList(g);
+  if(!list.length) return;
+  startSet(shuffle(list), "比較："+g.name); S.memo=g.memo; render();
 }
 function startMock(type){
   let list, minutes, pass, title;
@@ -1533,7 +1668,7 @@ function startMock(type){
   }
   list = prepKK(list);
   const total = list.reduce((s,q)=>s+points(q),0);
-  S = {mode:"mock", title, list, i:0, ans:blankAns(list), start:Date.now(),
+  S = {mode:"mock", title, list, i:0, ans:blankAns(list), unsure:list.map(()=>false), start:Date.now(), spoken:"",
        end: store.settings.timeLimit ? Date.now()+minutes*60000 : null, pass, total};
   render(); startTimer();
 }
@@ -1546,17 +1681,17 @@ function render(){
   let body;
   if(q.kind==="tf"){
     body = `
-      <span class="qcat">${esc(q.cat)}</span>${q.hard&&done?` <span class="qcat hard">意地悪</span>`:""}
+      <div class="qhead"><span><span class="qcat">${esc(q.cat)}</span>${q.hard&&done?` <span class="qcat hard">意地悪</span>`:""}</span>${unsureBtn()}</div>
       ${q.sign?`<div class="sign">${SIGNS[q.sign]}</div>`:""}
       <div class="qtext">${esc(q.q)}</div>
       <div class="answers">
         <button class="ans o ${a===true?"sel":""}" ${done?"disabled":""} onclick="answerTF(true)">○</button>
         <button class="ans x ${a===false?"sel":""}" ${done?"disabled":""} onclick="answerTF(false)">×</button>
       </div>
-      ${done?`<div class="feedback ${a===q.ans?"ok":"ng"}"><b>${a===q.ans?"正解":"不正解"}</b>　正解は「${ox(q.ans)}」</div>${explainTF(q)}`:""}`;
+      ${done?`<div class="feedback ${a===q.ans?"ok":"ng"}"><b>${a===q.ans?"正解":"不正解"}</b>　正解は「${ox(q.ans)}」</div>${explainTF(q)}${memoBox()}`:""}`;
   }else{
     body = `
-      <span class="qcat">危険予測</span>
+      <div class="qhead"><span class="qcat">危険予測</span>${unsureBtn()}</div>
       <div class="scene">${esc(q.s)}</div>
       <div class="sub">次の3つについて、正しいものは○、誤っているものは×を選んでください（3つとも正解で2点）。</div>
       ${q.items.map((it,j)=>`
@@ -1568,13 +1703,13 @@ function render(){
           </div>
           ${done?`<div class="kkfb ${a[j]===it.ans?"ok":"ng"}"><b>${a[j]===it.ans?"正解":"不正解"}</b>（正解は${ox(it.ans)}）${esc(it.exp)}</div>`:""}
         </div>`).join("")}
-      ${done?`<div class="feedback ${isCorrect(q,a)?"ok":"ng"}"><b>${isCorrect(q,a)?"3つとも正解（2点）":"不正解（0点）"}</b></div>${explainKKTip(q)}`:""}
+      ${done?`<div class="feedback ${isCorrect(q,a)?"ok":"ng"}"><b>${isCorrect(q,a)?"3つとも正解（2点）":"不正解（0点）"}</b></div>${explainKKTip(q)}${memoBox()}`:""}
       ${S.mode==="instant"&&!done?`<button class="btn center" ${answered(q,a)?"":"disabled"} onclick="checkKK()">答え合わせ</button>`:""}`;
   }
   const unans = isBatch() ? S.list.filter((qq,k)=>!answered(qq,S.ans[k])).length : 0;
   app.innerHTML = `
     <div class="topbar"><button class="link" onclick="quit()">← やめる</button>
-      <span>${esc(S.title)}　${S.i+1} / ${n}</span><span id="timer"></span></div>
+      <span>${esc(S.title)}　${S.i+1} / ${n}</span><span class="tr">${canSpeak()?`<button class="link spk" onclick="speakCurrent(true)" aria-label="読み上げ">🔊</button>`:""}<span id="timer"></span></span></div>
     <div class="bar"><i style="width:${S.i/n*100}%"></i></div>
     <div class="card">${body}</div>
     ${isBatch() ? `
@@ -1589,18 +1724,46 @@ function render(){
     ${done ? `<button class="btn center" onclick="next()">${S.i<n-1?"次の問題":"結果を見る"}</button>` : ""}
   `;
   tick();
+  if(store.settings.tts) speakCurrent(false);
+}
+function unsureBtn(){
+  const on = S.unsure && S.unsure[S.i];
+  return `<button class="unsure ${on?"on":""}" onclick="toggleUnsure()">${on?"✓ 迷った":"迷った"}</button>`;
+}
+function memoBox(){ return S.memo?`<div class="exp cmpmemo"><div class="lbl">比較のポイント</div>${esc(S.memo)}</div>`:""; }
+function toggleUnsure(){
+  const k=S.i; S.unsure[k]=!S.unsure[k];
+  if(S.mode==="instant" && S.checked[k] && S.snap[k]){
+    const q=S.list[k]; restore(q.id,S.snap[k]); record(q,isCorrect(q,S.ans[k]),S.unsure[k]); save();
+  }
+  S.spoken = S.spoken; render();
+}
+function speakText(){
+  const q=S.list[S.i], a=S.ans[S.i], done=S.mode==="instant"&&S.checked[S.i];
+  if(q.kind==="tf"){
+    let t=q.q;
+    if(done) t=(a===q.ans?"正解。":"不正解。")+"正解は"+ox(q.ans)+"。"+(q.exp||"")+(q.trap?"。ひっかけポイント。"+q.trap:"");
+    return t;
+  }
+  if(done) return (isCorrect(q,a)?"3つとも正解。":"不正解。")+q.items.map((it,j)=>(j+1)+"番、正解は"+ox(it.ans)+"。"+it.exp).join("");
+  return q.s+"。"+q.items.map((it,j)=>(j+1)+"番。"+it.q).join("");
+}
+function speakCurrent(force){
+  const key = S.i+":"+(S.mode==="instant"&&S.checked[S.i]?"d":"q");
+  if(!force && S.spoken===key) return;
+  S.spoken = key; speak(speakText());
 }
 
 /* ===== 操作 ===== */
 function answerTF(v){
   const q = S.list[S.i]; S.ans[S.i]=v;
-  if(S.mode==="instant"){ S.checked[S.i]=true; record(q,v===q.ans); save(); render(); }
+  if(S.mode==="instant"){ S.checked[S.i]=true; S.snap[S.i]=snapOf(q.id); record(q,v===q.ans,S.unsure[S.i]); save(); render(); }
   else{ if(S.i<S.list.length-1) S.i++; render(); }
 }
 function setKK(j,v){ S.ans[S.i][j]=v; render(); }
-function checkKK(){ const q=S.list[S.i]; S.checked[S.i]=true; record(q,isCorrect(q,S.ans[S.i])); save(); render(); }
+function checkKK(){ const q=S.list[S.i]; S.checked[S.i]=true; S.snap[S.i]=snapOf(q.id); record(q,isCorrect(q,S.ans[S.i]),S.unsure[S.i]); save(); render(); }
 function go(k){ S.i=Math.max(0,Math.min(S.list.length-1,k)); render(); window.scrollTo(0,0); }
-function next(){ if(S.i<S.list.length-1){ S.i++; render(); window.scrollTo(0,0);} else result(); }
+function next(){ if(S.i<S.list.length-1){ S.i++; render(); window.scrollTo(0,0);} else { stopSpeak(); result(); } }
 function finishConfirm(){
   const un = S.list.filter((q,k)=>!answered(q,S.ans[k])).length;
   if(un && !confirm(`未回答が${un}問あります。採点しますか？`)) return;
@@ -1608,13 +1771,13 @@ function finishConfirm(){
 }
 function finishBatch(){
   stopTimer();
-  S.list.forEach((q,k)=>record(q,isCorrect(q,S.ans[k])));
+  S.list.forEach((q,k)=>record(q,isCorrect(q,S.ans[k]),S.unsure&&S.unsure[k]));
   save(); result();
 }
 function quit(){
   if(S && isBatch() && !confirm("中断しますか？（この回の成績は記録されません）")) return;
   if(S && S.mode==="instant" && S.checked.some(Boolean) && confirm("ここまでの結果を表示しますか？")) { result(); return; }
-  home();
+  stopSpeak(); home();
 }
 
 /* ===== 結果 ===== */
@@ -1622,11 +1785,12 @@ let resultFilter = "wrong";
 function result(){
   stopTimer();
   S.elapsed = S.elapsed || Date.now()-S.start;
-  const rows = S.list.map((q,k)=>({q,a:S.ans[k],ok:isCorrect(q,S.ans[k]),no:k+1}));
+  const rows = S.list.map((q,k)=>({q,a:S.ans[k],ok:isCorrect(q,S.ans[k]),no:k+1,un:!!(S.unsure&&S.unsure[k])}));
   const done = S.mode==="instant" ? rows.filter((r,k)=>S.checked[k]) : rows;
   const score = done.reduce((s,r)=>s+(r.ok?points(r.q):0),0);
   const total = S.mode==="mock" ? S.total : done.reduce((s,r)=>s+points(r.q),0);
   const wrong = done.filter(r=>!r.ok);
+  const unsureOk = done.filter(r=>r.ok&&r.un);
   const pass = S.mode==="mock" ? score>=S.pass : null;
   const kkRows = done.filter(r=>r.q.kind==="kk");
   const shown = resultFilter==="all" ? done : wrong;
@@ -1637,8 +1801,9 @@ function result(){
       <div class="big ${pass===null?"":pass?"pass":"fail"}">${score} / ${total}${S.mode==="mock"?"点":""}</div>
       <div>${pass===null?`正答率 ${total?Math.round(score/total*100):0}%`:pass?"合格ライン到達！":`不合格（合格は${S.pass}点以上）`}</div>
       ${kkRows.length&&S.mode==="mock"?`<div class="sub">文章問題 ${done.filter(r=>r.q.kind==="tf"&&r.ok).length}/${done.filter(r=>r.q.kind==="tf").length}問・危険予測 ${kkRows.filter(r=>r.ok).length}/${kkRows.length}題</div>`:""}
-      <div class="sub">所要時間 ${mins}分${String(secs).padStart(2,"0")}秒</div>
+      <div class="sub">所要時間 ${mins}分${String(secs).padStart(2,"0")}秒${unsureOk.length?`・迷って正解 ${unsureOk.length}問（復習に回します）`:""}</div>
     </div>
+    ${S.memo?`<div class="card"><div class="exp cmpmemo"><div class="lbl">比較のポイント</div>${esc(S.memo)}</div></div>`:""}
     ${wrong.length?`<button class="btn center" id="retry">間違えた${wrong.length}問をもう一度</button>`:""}
     <div class="seg small">
       <button class="${resultFilter==="wrong"?"on":""}" onclick="resultFilter='wrong';result()">間違えた問題（${wrong.length}）</button>
@@ -1653,7 +1818,7 @@ function result(){
 function reviewRow(r){
   const q=r.q;
   if(q.kind==="tf") return `
-    <div class="review"><div class="rhead"><span class="${r.ok?"pass":"fail"}">${r.ok?"✓":"✗"}</span> <span class="sub">${r.no}.</span> <span class="qcat">${esc(q.cat)}</span>${q.hard?` <span class="qcat hard">意地悪</span>`:""}</div>
+    <div class="review"><div class="rhead"><span class="${r.ok?"pass":"fail"}">${r.ok?"✓":"✗"}</span> <span class="sub">${r.no}.</span> <span class="qcat">${esc(q.cat)}</span>${q.hard?` <span class="qcat hard">意地悪</span>`:""}${r.un?` <span class="qcat">迷った</span>`:""}</div>
       ${q.sign?`<div class="sign small">${SIGNS[q.sign]}</div>`:""}
       <div>${esc(q.q)}</div>
       <div class="mark">正解：<span class="${q.ans?"pass":"fail"}">${ox(q.ans)}</span>　<span class="sub">あなた：${r.a===null?"未回答":ox(r.a)}</span></div>
@@ -1665,6 +1830,41 @@ function reviewRow(r){
       ${explainKKTip(q)}
     </div>`;
 }
+
+/* ===== 数字暗記カード ===== */
+let F = null;
+function startFlash(onlyNew){
+  stopTimer(); S=null;
+  let idx = FLASH.map((f,i)=>i); if(onlyNew) idx = idx.filter(i=>!store.flash[i]);
+  if(!idx.length) return;
+  F = {queue: shuffle(idx), shown:false, done:0, total:idx.length};
+  renderFlash();
+}
+function renderFlash(){
+  if(!F.queue.length){
+    app.innerHTML = `<div class="topbar"><button class="link" onclick="stopSpeak();home()">← ホーム</button><span>数字暗記カード</span><span></span></div>
+      <div class="card center"><div class="big pass">完了</div><div>${F.total}枚すべて「覚えた」になりました。</div></div>
+      <button class="btn ghost center" onclick="stopSpeak();home()">ホームへ戻る</button>`;
+    return;
+  }
+  const i=F.queue[0], f=FLASH[i];
+  app.innerHTML = `
+    <div class="topbar"><button class="link" onclick="stopSpeak();home()">← やめる</button><span>覚えた ${F.done} / ${F.total}</span><span class="tr">${canSpeak()?`<button class="link spk" onclick="speak(flashText())">🔊</button>`:""}</span></div>
+    <div class="bar"><i style="width:${F.done/F.total*100}%"></i></div>
+    <div class="card flash" onclick="flipFlash()">
+      <span class="qcat">${esc(f[0])}</span>
+      <div class="ffront">${esc(f[1])}</div>
+      ${F.shown?`<div class="fback">${esc(f[2])}</div>`:`<div class="sub center">タップして答えを見る</div>`}
+    </div>
+    ${F.shown?`<div class="row">
+      <button class="btn ghost center" onclick="flashAgain()">もう一度</button>
+      <button class="btn center" onclick="flashOK()">覚えた</button></div>`:""}`;
+  if(store.settings.tts) speak(flashText());
+}
+function flashText(){ const f=FLASH[F.queue[0]]; return F.shown? f[2] : f[0]+"。"+f[1]; }
+function flipFlash(){ if(!F.shown){ F.shown=true; renderFlash(); } }
+function flashOK(){ const i=F.queue.shift(); store.flash[i]=true; save(); F.done++; F.shown=false; renderFlash(); }
+function flashAgain(){ const i=F.queue.shift(); store.flash[i]=false; save(); F.queue.splice(Math.min(3,F.queue.length),0,i); F.shown=false; renderFlash(); }
 
 /* ===== タイマー（制限時間なしのときは経過時間を表示） ===== */
 function startTimer(){ stopTimer(); timerId=setInterval(tick,1000); }
@@ -1699,7 +1899,7 @@ function importQ(){
   document.getElementById("impMsg").textContent = `${added}問追加しました${bad?`（読み込めなかった行：${bad}）`:""}。追加済み：${store.custom.length}問`;
 }
 function clearCustom(){ if(confirm("追加した問題をすべて削除しますか？")){ store.custom=[]; save(); home(); } }
-function resetStats(){ if(confirm("成績をすべてリセットしますか？")){ store.stats={}; save(); home(); } }
+function resetStats(){ if(confirm("成績（復習の予定・暗記カードの記録を含む）をすべてリセットしますか？")){ store.stats={}; store.srs={}; store.flash={}; save(); home(); } }
 
 home();
 
